@@ -28,9 +28,9 @@ from sklearn.metrics import mean_squared_error
 # In[ ]:
 
 
-from rl.agents import DQNAgent   #our agent to train
-from rl.policy import BoltzmannQPolicy  #policy vs value learning
-from rl.memory import SequentialMemory  #maintain memory
+#from rl.agents import DQNAgent   #our agent to train
+#from rl.policy import BoltzmannQPolicy  #policy vs value learning
+#from rl.memory import SequentialMemory  #maintain memory
 
 
 # In[ ]:
