@@ -168,7 +168,7 @@ def EvaluationAndPlot(): #currently unused
 # In[11]:
 
 
-dataset = pd.read_csv('C:/Users/hsipp/Downloads/MCD_stock_data (1).csv', index_col='Date', parse_dates=['Date'])
+dataset = pd.read_csv('MCD_stock_data (1).csv', index_col='Date', parse_dates=['Date'])
 
 dataset.index = pd.to_datetime(dataset.index)
 dataset['Day'] = dataset.index.dayofyear  # list days as their day of year
