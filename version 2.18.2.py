@@ -31,7 +31,7 @@ useMetric = "DirErr"
 curr_BestResult = 0
 attrib_used_metric = []  # this will save which attributes were used that got the best metric
 
-model_SaveLocation = 'C:/Users/hsipp/Downloads/saved_GRU_Model.h5' # This string needs to include the directory where the model will be saved.
+model_SaveLocation = 'saved_GRU_Model.h5' # This string needs to include the directory where the model will be saved.
 
 
 
