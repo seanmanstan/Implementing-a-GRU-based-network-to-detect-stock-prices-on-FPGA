@@ -218,9 +218,9 @@ def EvaluationAndPlot(): #currently unused
 
 #dataset = web.DataReader('AAPL', data_source='yahoo', start = '2009-01-05', end='2019-12-20')
 
-#dataset = pd.read_csv('C:/Users/hsipp/Downloads/MCD_stock_data (1).csv', index_col='Date', parse_dates=['Date'])
-dataset = pd.read_csv('C:/Users/hsipp/Downloads/AAPL_stock_data (1).csv', index_col='Date', parse_dates=['Date'])
-#dataset = pd.read_csv('C:/Users/hsipp/Downloads/COKE_stock_data.csv', index_col='Date', parse_dates=['Date'])
+#dataset = pd.read_csv('MCD_stock_data (1).csv', index_col='Date', parse_dates=['Date'])
+dataset = pd.read_csv('AAPL_stock_data (1).csv', index_col='Date', parse_dates=['Date'])
+#dataset = pd.read_csv('COKE_stock_data.csv', index_col='Date', parse_dates=['Date'])
 
 
 dataset.index = pd.to_datetime(dataset.index) #grab the date column so values can be taken out of it.
