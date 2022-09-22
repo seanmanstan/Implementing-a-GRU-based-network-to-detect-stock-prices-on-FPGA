@@ -28,7 +28,7 @@ import sys
 
 #grab the system arg
 ticker_File = sys.argv[2]
-
+print(ticker_File)
 
 
 ##This is var will be used to make a decision of which GRU module to save.
