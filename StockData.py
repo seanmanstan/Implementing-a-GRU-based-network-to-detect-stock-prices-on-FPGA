@@ -109,9 +109,9 @@ for x in stockTickerArray: #iterate over every stock ticker in array
             if (date != "Date"): #ignore the header column
                 fileDate = dt.datetime.strptime(date, '%Y-%m-%d') #convert date in file to datetime object       
                 if (fileDate < (earliestEpsDate - dt.timedelta(weeks=13))): #check if date in the file is before the earliest quarter we have data for
-                    epsColumn.append("NAN") 
+                    epsColumn.append("NaN") 
                 elif (fileDate > latestEpsDate): #check if date in the file is a date that is in the current fiscal quarter
-                    epsColumn.append("NAN")
+                    epsColumn.append("NaN")
                 else: #we have data for these dates
                     while i < (len(epsDataList) - 2 ):
                         if (fileDate < earliestEpsDate):
@@ -147,9 +147,9 @@ for x in stockTickerArray: #iterate over every stock ticker in array
             for row in csv_reader: #look at one row at a time
                 date = row[0]
                 if (date != "Date"): #ignore the header column
-                    amt_of_buys.append("NAN")
-                    amt_of_sells.append("NAN")
-                    amt_traded.append("NAN")
+                    amt_of_buys.append("NaN")
+                    amt_of_sells.append("NaN")
+                    amt_traded.append("NaN")
         
     else:
         trade_dates= [] #(Trade date) index 2
@@ -186,13 +186,13 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                 if (date != "Date"): #ignore the header column
                     fileDate = dt.datetime.strptime(date, '%Y-%m-%d')#convert date in file to datetime object
                     if (fileDate < trade_dates[-1]): #if date in file is less than earliest date
-                        amt_of_buys.append("NAN")
-                        amt_of_sells.append("NAN")
-                        amt_traded.append("NAN")
+                        amt_of_buys.append("NaN")
+                        amt_of_sells.append("NaN")
+                        amt_traded.append("NaN")
                     elif (fileDate > trade_dates[0]): #if date in file is more recent than latest date
-                        amt_of_buys.append("NAN")
-                        amt_of_sells.append("NAN")
-                        amt_traded.append("NAN")
+                        amt_of_buys.append("NaN")
+                        amt_of_sells.append("NaN")
+                        amt_traded.append("NaN")
                     else:
                         try:
                             index = trade_dates.index(fileDate) #find at what index is the file date in the trade dates list
@@ -296,9 +296,9 @@ for x in stockTickerArray: #iterate over every stock ticker in array
             if (date != "Date"): #ignore the header column
                 fileDate = dt.datetime.strptime(date, '%Y-%m-%d') #convert date in file to datetime object       
                 if (fileDate < data.index[0]): #check if date in the file is before the earliest date we have data for
-                    gtrendData.append("NAN") 
+                    gtrendData.append("NaN") 
                 elif (fileDate > data.index[-1]): #check if date in the file is a date that is too recent
-                    gtrendData.append("NAN")
+                    gtrendData.append("NaN")
                     #print("file date = ", fileDate, "trend date = ", data.index[-1])
                 else: #we have data for these dates
                     while i < (len(data)):
