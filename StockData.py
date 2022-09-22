@@ -334,7 +334,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
 ############################################################################################################################
 print("Script complete! :D ")
 
-os.system('python version_2.18.2.py ' + stock_ticker)
+os.system('python version_2.18.3.py ' + stock_ticker)
 
 # In[ ]:
 
