@@ -27,7 +27,7 @@ import sys
 
 
 #grab the system arg
-ticker_File = sys.argv[2]
+ticker_File = sys.argv[1]
 print(ticker_File)
 
 
