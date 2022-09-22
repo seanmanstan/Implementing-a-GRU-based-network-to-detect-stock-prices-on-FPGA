@@ -47,7 +47,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
     stock_ticker = x
     print("Getting" ,stock_ticker, "stock data..." )
 
-    fileName = stock_ticker + "_stock_data.csv" #current file name is based on the current stock ticker
+    fileName = stock_ticker + ".csv" #current file name is based on the current stock ticker
 
 ###########################################################################################################################
 ################################################################EPS########################################################
