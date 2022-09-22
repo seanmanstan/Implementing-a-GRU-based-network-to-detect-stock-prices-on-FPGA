@@ -227,7 +227,10 @@ def EvaluationAndPlot(): #currently unused
 
 #dataset = pd.read_csv('MCD_stock_data (1).csv', index_col='Date', parse_dates=['Date'])
 #dataset = pd.read_csv('AAPL_stock_data (1).csv', index_col='Date', parse_dates=['Date'])
-dataset = pd.read_csv('COKE_stock_data (1).csv', index_col='Date', parse_dates=['Date'])
+
+file_name_used = ticker_File + '.csv'
+print(file_name_used + ": this file was called")
+dataset = pd.read_csv(file_name_used, index_col='Date', parse_dates=['Date'])
 
 
 dataset.index = pd.to_datetime(dataset.index) #grab the date column so values can be taken out of it.
