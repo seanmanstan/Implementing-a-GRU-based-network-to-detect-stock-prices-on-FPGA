@@ -23,6 +23,12 @@ from keras.layers import Dense, Dropout, GRU, Bidirectional
 #from keras.optimizers import sgd
 import math
 from sklearn.metrics import mean_squared_error
+import sys
+
+
+#grab the system arg
+ticker_File = sys.argv[2]
+
 
 
 ##This is var will be used to make a decision of which GRU module to save.
@@ -33,6 +39,7 @@ attrib_used_metric = []  # this will save which attributes were used that got th
 
 model_SaveLocation = 'saved_GRU_Model.h5' # This string needs to include the directory where the model will be saved.
 
+#data_Location = 
 
 
 # In[18]:
