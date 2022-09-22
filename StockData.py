@@ -14,6 +14,7 @@ import bs4 #for html parsing
 from bs4 import BeautifulSoup  #for html parsing
 import pytrends #for google trends
 from pytrends.request import TrendReq #for google trends
+import os
 
 #enter start date, limited by whatever stock has the "least oldest" stock data available
 startDate = input("Enter START date in format 'YYYY-MM-DD': ") #get start date from user
@@ -333,6 +334,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
 ############################################################################################################################
 print("Script complete! :D ")
 
+os.system('python version_2.18.2.py ' + stock_ticker)
 
 # In[ ]:
 
