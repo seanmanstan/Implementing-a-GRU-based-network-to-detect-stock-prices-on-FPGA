@@ -448,9 +448,6 @@ for j in range(len(options)):
     print("Model Cleared")
     
 
-#This is just here so early loop termination can be made when testing code.
-    if(j == 2):
-        break
     
 
 
