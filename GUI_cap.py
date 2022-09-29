@@ -3,6 +3,13 @@
 #800000  Hex for maroon
 
 from tkinter import Tk, Label, Button, X, BOTH, Frame, Text, END, Entry, StringVar
+import sys
+import os
+
+if os.environ.get('DISPLAY','') == '':
+    print('no display found. Using :0.0')
+    os.environ.__setitem__('DISPLAY', ':0.0')
+
 
 def submit():
 
