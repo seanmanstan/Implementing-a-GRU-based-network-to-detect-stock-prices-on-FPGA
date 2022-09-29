@@ -26,7 +26,7 @@ name_entry = Entry(root, textvariable = ticker, font=('calibre',10,'normal'))
 
 sub_btn= Button(root,text = 'Submit', command = submit)
 
-C:\Users\hsipp\PycharmProjects\GUIProto\GUI_cap.py
+
 '''
 button = Button(
     text="Click me!",
