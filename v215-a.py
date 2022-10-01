@@ -252,9 +252,9 @@ dataset = dataset.drop(columns = ['Day']) ## Drop the original days column and r
 dataset['Day'] = day_sin_signal
 
 
-MaxData = dataset[:'2021']['High'].max() #grba the max value out of the high
+MaxData = dataset[:'2019']['High'].max() #grba the max value out of the high
 #print(MaxData)
-MinData = dataset[:'2021']['High'].min() #grab the min value out of the high
+MinData = dataset[:'2019']['High'].min() #grab the min value out of the high
 increase_max = (MaxData/MinData)/9 # This aids to find a "max" value the stock can exist at, this is needed for scaling
 #this is calculation is the high growth potential from min to max over and arbitrary 9 years.
 
@@ -329,8 +329,8 @@ output_var = pd.DataFrame( dataset['Close'] )  ## Select the close value as the 
 for j in range(len(options)):
     numChars = len(characteristics[options[j]]) #save num of how many characteristics are being used for building model
 
-    Y_train = output_var[:'2021'].values ## grab training data from outputvar
-    Y_test = output_var['2022':'2022'].values #grab test data from outputvar
+    Y_train = output_var[:'2019'].values ## grab training data from outputvar
+    Y_test = output_var['2020':'2020'].values #grab test data from outputvar
 
     #print(i)
     #print(options[j])
@@ -338,8 +338,8 @@ for j in range(len(options)):
 
     X_Values = pd.DataFrame( dataset[characteristics[options[j]]])
     print(X_Values)
-    X_train = X_Values[:'2021'].values
-    X_test = X_Values['2022':'2022'].values  ## grouping day of year in and scaling...
+    X_train = X_Values[:'2019'].values
+    X_test = X_Values['2020':'2020'].values  ## grouping day of year in and scaling...
     #print(X_test)
 
 
