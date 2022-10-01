@@ -376,7 +376,7 @@ for j in range(len(options)):
 
 
     X_test_lookback, Y_test_ready = np.array(X_test_lookback),np.array(Y_test_ready)
-    #print(len(options[j]))
+    print(len(options[j]))
     X_test_lookback = np.reshape(X_test_lookback, (X_test_lookback.shape[0],X_test_lookback.shape[1],numChars))
 
     #*************************************************************************************************************
