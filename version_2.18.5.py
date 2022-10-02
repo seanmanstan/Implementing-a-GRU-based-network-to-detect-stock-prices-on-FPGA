@@ -43,7 +43,7 @@ model_SaveLocation = "saved_GRU_" + ticker_File.strip('.csv') + "_Model.h5" # Th
 
 training_Data_forCSV = [] #should be stock name, attributes, DirErr, RMSE
 CSV_Header = ['Ticker', 'Attributes', 'DirErr', 'RMSE']
-csv_file_name = "Training_data"
+csv_file_name = "Training_data"+ticker_File
 
 
 # Some functions to help out
