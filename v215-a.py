@@ -37,13 +37,15 @@ print(ticker_File)
 # options are either directional error "DirErr" or RMSE "RMSE"
 useMetric = "DirErr"
 curr_BestResult = 0
+curr_BestResultRMSE = 100
+
 attrib_used_metric = []  # this will save which attributes were used that got the best metric
 
 model_SaveLocation = "saved_GRU_" + ticker_File.strip('.csv') + "_Model.h5" # This string needs to include the directory where the model will be saved.
 
 training_Data_forCSV = [] #should be stock name, attributes, DirErr, RMSE
 CSV_Header = ['Ticker', 'Attributes', 'DirErr', 'RMSE']
-csv_file_name = "Training_data"
+csv_file_name = "Training_data"+ticker_File
 
 
 # Some functions to help out
@@ -252,9 +254,9 @@ dataset = dataset.drop(columns = ['Day']) ## Drop the original days column and r
 dataset['Day'] = day_sin_signal
 
 
-MaxData = dataset[:'2019']['High'].max() #grba the max value out of the high
+MaxData = dataset[:'2021']['High'].max() #grba the max value out of the high
 #print(MaxData)
-MinData = dataset[:'2019']['High'].min() #grab the min value out of the high
+MinData = dataset[:'2021']['High'].min() #grab the min value out of the high
 increase_max = (MaxData/MinData)/9 # This aids to find a "max" value the stock can exist at, this is needed for scaling
 #this is calculation is the high growth potential from min to max over and arbitrary 9 years.
 
@@ -316,7 +318,7 @@ characteristics["arrayset23"] = ['High', 'Low', 'IR', 'PercentChange']
 ## this may need to be added above.
 
 
-lookback_days = 60 # number of days to lookback on the data sets
+lookback_days = 1 # number of days to lookback on the data sets
 
 options = list(characteristics.keys()) # make a list out of the keys so they can be better tracked and iterated through.
 #print(options[0])
@@ -329,8 +331,8 @@ output_var = pd.DataFrame( dataset['Close'] )  ## Select the close value as the 
 for j in range(len(options)):
     numChars = len(characteristics[options[j]]) #save num of how many characteristics are being used for building model
 
-    Y_train = output_var[:'2019'].values ## grab training data from outputvar
-    Y_test = output_var['2020':'2020'].values #grab test data from outputvar
+    Y_train = output_var[:'2021'].values ## grab training data from outputvar
+    Y_test = output_var['2022':'2022'].values #grab test data from outputvar
 
     #print(i)
     #print(options[j])
@@ -338,8 +340,10 @@ for j in range(len(options)):
 
     X_Values = pd.DataFrame( dataset[characteristics[options[j]]])
     print(X_Values)
-    X_train = X_Values[:'2019'].values
-    X_test = X_Values['2020':'2020'].values  ## grouping day of year in and scaling...
+    print(len(X_Values))
+    X_train = X_Values[:'2021'].values
+    X_test = X_Values['2022':'2022'].values  ## grouping day of year in and scaling...
+    print(len(X_test))
     #print(X_test)
 
 
@@ -369,14 +373,17 @@ for j in range(len(options)):
     # each lookback set has a corresponding Y value, this is in order to handle the offest of looking back
     X_test_lookback = []
     Y_test_ready = []
+    print(len(X_test))
 
+    lookback_days=int(len(X_test)/4)
+    lookback_days=int(lookback_days)
     for i in range(lookback_days,len(X_test)):  ## *************double check this len statement
         X_test_lookback.append(X_test[i-lookback_days:i])
         Y_test_ready.append(Y_test[i,0]) ## this line is what causes the need for graph shfiting
 
 
     X_test_lookback, Y_test_ready = np.array(X_test_lookback),np.array(Y_test_ready)
-    print(len(options[j]))
+    #print(len(options[j]))
     X_test_lookback = np.reshape(X_test_lookback, (X_test_lookback.shape[0],X_test_lookback.shape[1],numChars))
 
     #*************************************************************************************************************
@@ -388,7 +395,7 @@ for j in range(len(options)):
     X_train_lookback = []
     Y_train_ready = []
     #print(training_set_scaled[54-54:54, 1])
-
+    print(range(lookback_days,len(X_train)))
     for i in range(lookback_days,len(X_train)): ## *************double check this len statement
         X_train_lookback.append(X_train[i-lookback_days:i])
         Y_train_ready.append(Y_train[i,0])
@@ -450,7 +457,7 @@ for j in range(len(options)):
     tempHold_DirErr = Directional_error(Y_test_ready, GRU_predicted_stock_price)
     if(useMetric == "DirErr"):
         if((tempHold_DirErr > curr_BestResult) or ((tempHold_DirErr == curr_BestResult) and (tempHold_RMSE < curr_BestResultRMSE) ) ):
-            curr_BestResultDirErr = tempHold_DirErr
+            curr_BestResult = tempHold_DirErr
             curr_BestResultRMSE = tempHold_RMSE
             attrib_used_metric = characteristics[options[j]]
             prGreen("This Model has been saved")
