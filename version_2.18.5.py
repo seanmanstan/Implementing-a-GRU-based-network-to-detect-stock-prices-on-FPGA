@@ -316,7 +316,7 @@ characteristics["arrayset23"] = ['High', 'Low', 'IR', 'PercentChange']
 ## this may need to be added above.
 
 
-lookback_days = 52 # number of days to lookback on the data sets
+lookback_days = 30 # number of days to lookback on the data sets
 
 options = list(characteristics.keys()) # make a list out of the keys so they can be better tracked and iterated through.
 #print(options[0])
