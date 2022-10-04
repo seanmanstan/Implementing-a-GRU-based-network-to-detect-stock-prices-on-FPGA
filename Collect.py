@@ -316,6 +316,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
 #################################################APPEND EVERYTHING#########################################################
     
     df = pd.read_csv(fileName)
+    
     #buys_column = pd.DataFrame({'Buys': amt_of_buys})
     #sells_column = pd.DataFrame({'Sells': amt_of_sells})
     #traded_column = pd.DataFrame({'Traded': amt_traded})
