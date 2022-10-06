@@ -6,7 +6,7 @@ from datetime import datetime
 start = str(datetime.now())
 end =str(datetime.now())
 filed="L.csv"
-b=open(filed,w)
+b=open(filed,'w')
 writer=csv.writer(b)
 writer.writerow(start)
 writer.writerow(end)
