@@ -1,5 +1,7 @@
-import csv
-from datetime import datetime
+import datetime as dt  # for working with dates
+import pandas as pd  # for working with large lists and large csv files
+from pandas_datareader import data as pdr  # for main stock data
+import csv  # for working with csv files
 start = datetime.now()
 end =datetime.now()
 tims=pdr.DataReader(start,end)
