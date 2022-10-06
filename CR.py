@@ -814,6 +814,12 @@ for m in stockTickerArray:
     
     makeModelDataCSVFile(csv_file_name)
     end = datetime.now()
+    filed="L.csv"
+    b=open(filed,'w')
+    writer=csv.writer(b)
+    writer.writerow(start)
+    writer.writerow(end)
+    b.close()
     reconstruct_Model = keras.models.load_model(model_SaveLocation)
 
 # In[ ]:
