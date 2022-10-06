@@ -814,7 +814,7 @@ for m in stockTickerArray:
     
     makeModelDataCSVFile(csv_file_name)
     end = datetime.now()
-    filed="L.csv"
+    filed= "time"+ticker_File+".csv"
     b=open(filed,'w')
     writer=csv.writer(b)
     writer.writerow(start)
