@@ -7,5 +7,8 @@ start = str(datetime.now())
 end =str(datetime.now())
 tims=pdr.DataReader(start,end)
 filed="L.csv"
-with open(filed, 'w',encoding='UTF8') as f:  # this writes the current stock tickers data to a csv file
-  tims.to_csv(filed)
+b=open(filed,w)
+writer=csv.writer(b)
+writer.writerow(start)
+writer.writerow(end)
+b.close()
