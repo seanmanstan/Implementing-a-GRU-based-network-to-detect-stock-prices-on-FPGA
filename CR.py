@@ -17,6 +17,7 @@ from pytrends.request import TrendReq  # for google trends
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 plt.style.use('fivethirtyeight')
 import pandas_datareader as web  # grab data from online
@@ -368,7 +369,7 @@ for m in stockTickerArray:
 
     # grab the system arg
     ticker_File = m
-
+    start= datetime.now()
     # sys.argv[1]
     print(ticker_File)
 
@@ -810,9 +811,9 @@ for m in stockTickerArray:
 
     # This section will then load in the best found model found and use it to make predictions for the user******************************************************
     # As well as make a call to create the csv file with all the stock data
-
+    
     makeModelDataCSVFile(csv_file_name)
-
+    end = datetime.now()
     reconstruct_Model = keras.models.load_model(model_SaveLocation)
 
 # In[ ]:
