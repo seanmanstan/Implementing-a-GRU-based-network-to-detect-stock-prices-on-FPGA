@@ -5,7 +5,6 @@ import csv  # for working with csv files
 from datetime import datetime
 start = str(datetime.now())
 end =str(datetime.now())
-tims=pdr.DataReader(start,end)
 filed="L.csv"
 b=open(filed,w)
 writer=csv.writer(b)
