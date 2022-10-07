@@ -34,6 +34,11 @@ startDate = input("Enter START date in format 'YYYY-MM-DD': ") #get start date f
 startDate = dt.datetime.strptime(startDate, '%Y-%m-%d') #make start date a "datetime" object in order to work with it
 #enter end date
 endDate = dt.datetime.now() #set end date to today ("datetime" object)
+#enter start date, limited by whatever stock has the "least oldest" stock data available
+startDate = input("Enter START date in format 'YYYY-MM-DD': ") #get start date from user
+startDate = dt.datetime.strptime(startDate, '%Y-%m-%d') #make start date a "datetime" object in order to work with it
+#enter end date
+endDate = dt.datetime.now() #set end date to today ("datetime" object)
 
 #prompt user for stock tickers
 num_of_tweets = int(input("How many tweets do you want to pull per month (note that it takes about 5 extra seconds per 100 tweets): ")) # about 5 seconds per 100 tweets
@@ -129,9 +134,9 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                 if (date != "Date"): #ignore the header column
                     fileDate = dt.datetime.strptime(date, '%Y-%m-%d') #convert date in file to datetime object       
                     if (fileDate < (earliestEpsDate - dt.timedelta(weeks=13))): #check if date in the file is before the earliest quarter we have data for
-                        epsColumn.append("NAN") 
+                        epsColumn.append("NaN") 
                     elif (fileDate > latestEpsDate): #check if date in the file is a date that is in the current fiscal quarter
-                        epsColumn.append("NAN")
+                        epsColumn.append("NaN")
                     else: #we have data for these dates
                         while i < (len(epsDataList) - 2 ):
                             if (fileDate < earliestEpsDate):
@@ -478,6 +483,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
 ############################################################################################################################
 print("Script complete! :D ")
 #print("--- %s seconds ---" % (time.time() - start_time))
+
 for m in stockTickerArray:
     start = datetime.now()
 
