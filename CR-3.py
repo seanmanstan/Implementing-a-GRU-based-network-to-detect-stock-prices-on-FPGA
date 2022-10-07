@@ -824,7 +824,7 @@ for m in stockTickerArray:
             TempDataFrame['Close'])  ## Select the close value as the output data set, this will be used for "Y"
 
         # print("TempDataFrame:")
-        # print(TempDataFrame)
+        print(TempDataFrame)
         # print("\n","This is the output_var, aka the y values")
         # print(output_var)
         TempDataFrame = TempDataFrame.drop("Close", axis=1)
