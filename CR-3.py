@@ -813,9 +813,9 @@ for m in stockTickerArray:
             characteristics[options[j]])  # save num of how many characteristics are being used for building model
 
         templistofChars = characteristics[options[j]]
-        #templistofChars.append('Close')
+        templistofChars.append('Close')
 
-        # print("This is the temp list of attributes: ",templistofChars)
+        print("This is the temp list of attributes: ",templistofChars)
 
         TempDataFrame = pd.DataFrame(dataset[templistofChars])
         TempDataFrame = TempDataFrame.dropna()  # remove all NaNs, due to these being incomplete data sets
