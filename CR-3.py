@@ -27,6 +27,8 @@ from sklearn.metrics import mean_squared_error
 import sys
 import csv
 from datetime import datetime
+import snscrape.modules.twitter as sntwitter
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 #enter start date, limited by whatever stock has the "least oldest" stock data available
 startDate = input("Enter START date in format 'YYYY-MM-DD': ") #get start date from user
 startDate = dt.datetime.strptime(startDate, '%Y-%m-%d') #make start date a "datetime" object in order to work with it
