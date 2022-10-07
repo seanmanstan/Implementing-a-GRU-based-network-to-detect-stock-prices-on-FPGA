@@ -126,9 +126,9 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                 if (date != "Date"): #ignore the header column
                     fileDate = dt.datetime.strptime(date, '%Y-%m-%d') #convert date in file to datetime object       
                     if (fileDate < (earliestEpsDate - dt.timedelta(weeks=13))): #check if date in the file is before the earliest quarter we have data for
-                        epsColumn.append("NAN") 
+                        epsColumn.append("NaN") 
                     elif (fileDate > latestEpsDate): #check if date in the file is a date that is in the current fiscal quarter
-                        epsColumn.append("NAN")
+                        epsColumn.append("NaN")
                     else: #we have data for these dates
                         while i < (len(epsDataList) - 2 ):
                             if (fileDate < earliestEpsDate):
