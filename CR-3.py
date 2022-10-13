@@ -1,34 +1,46 @@
-# Importing dependencies
-import datetime as dt  # for working with dates
-import pandas as pd  # for working with large lists and large csv files
-from pandas_datareader import data as pdr  # for main stock data
-import csv  # for working with csv files
-import requests  # for html parsing
-import bs4  # for html parsing
-from bs4 import BeautifulSoup  # for html parsing
-import pytrends  # for google trends
-from pytrends.request import TrendReq  # for google trends
+#Stock data libaries import
+#Importing dependencies
+import datetime as dt #for working with dates
+import pandas as pd #for working with large lists and large csv files
+from pandas_datareader import data as pdr #for main stock data
+import csv #for working with csv files
+import requests #for html parsing
+import bs4 #for html parsing
+from bs4 import BeautifulSoup  #for html parsing
+import pytrends #for google trends
+from pytrends.request import TrendReq #for google trends
+import time
+#tweet scraper libs
+import snscrape.modules.twitter as sntwitter
+from dateutil.relativedelta import relativedelta
+from datetime import date
+from statistics import mean
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import string
 import os
+
+#GRU data libaries import
 import numpy as np
 import matplotlib.pyplot as plt
-
 plt.style.use('fivethirtyeight')
-import pandas_datareader as web  # grab data from online
+import pandas_datareader as web #grab data from online
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler  # replaced
+from sklearn.preprocessing import MinMaxScaler #replaced
 from tensorflow import keras
 from keras.models import Sequential
 from keras.utils.vis_utils import plot_model
-# from keras. utils.vis_utils import plot_model
+#from keras. utils.vis_utils import plot_model
 from keras.layers import Dense, Dropout, GRU, Bidirectional
-# from keras.optimizers import sgd
+#from keras.optimizers import sgd
 import math
 from sklearn.metrics import mean_squared_error
 import sys
 import csv
 from datetime import datetime
-import snscrape.modules.twitter as sntwitter
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+
+
+
 #enter start date, limited by whatever stock has the "least oldest" stock data available
 startDate = input("Enter START date in format 'YYYY-MM-DD': ") #get start date from user
 startDate = dt.datetime.strptime(startDate, '%Y-%m-%d') #make start date a "datetime" object in order to work with it
