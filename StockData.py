@@ -352,17 +352,13 @@ for x in stockTickerArray: #iterate over every stock ticker in array
 
         kw = searchWordArray[j]
 
-        #commented out and hardcoded for testing purposes
-        #start_date = input("What day do you want to search from (YYYY-MM-DD): ")
-        #start_date = start_date[:8] + "01" #beginning of the start date month
-
-        start_date= "2022-01-01" #FIX ME set to 2010-01-01
+        #commented out and hardcoded for availability purposes 
+        start_date = "2022-01-01" #FIX ME set to 2010-01-01
 
         #commented out and hardcoded for testing purposes
-        #end_date = input("What day do you want to stop search (YYYY-MM-DD): ")
-        #end_date = end_date[:8] + "01" #beginning of the end date month
-
-        end_date= "2022-10-01" #FIX ME set to todays date
+        #end_date = "2022-10-01" #FIX ME set to todays date
+        
+        end_date = endDate.strftime("%Y-%m-%d")
 
         search_settings = (kw +' since:' + start_date +' until:' + end_date)
         #print(search_settings)
@@ -430,8 +426,9 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                 else:
                     pass #do nothing
 
-    except:
-        pass
+    except Exception as ex:
+        print(ex)        
+        #pass
 
                             
 ###########################################################################################################################
