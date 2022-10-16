@@ -335,7 +335,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
 ############################################################################################################################
 print("Script complete! :D ")
 for m in stockTickerArray:
-    os.system("version_2.19.py "+ m)
+    os.system("/home/debian/fpgadown/version_2.19.py "+ m)
 
 # In[ ]:
 
