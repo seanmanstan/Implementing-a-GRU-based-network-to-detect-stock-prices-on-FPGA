@@ -477,7 +477,6 @@ for x in stockTickerArray: #iterate over every stock ticker in array
 print("Script complete! :D ")
 #print("--- %s seconds ---" % (time.time() - start_time))
 
-os.system('python version_2.18.4.py ' + stock_ticker)
 
 # In[ ]:
 
