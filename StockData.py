@@ -27,9 +27,12 @@ import string
 import os
 
 #enter start date, limited by whatever stock has the "least oldest" stock data available
-startDate = input("Enter START date in format 'YYYY-MM-DD': ") #get start date from user
-startDate = dt.datetime.strptime(startDate, '%Y-%m-%d') #make start date a "datetime" object in order to work with it
-#enter end date
+
+#startDate = input("Enter START date in format 'YYYY-MM-DD': ") #get start date from user
+#instead of asking for start date set start date to 2001-01-01
+startDate = dt.datetime.strptime("2000-01-01", '%Y-%m-%d') #make start date a "datetime" object in order to work with it
+
+#set end date to today 
 endDate = dt.datetime.now() #set end date to today ("datetime" object)
 
 #prompt user for stock tickers
@@ -353,7 +356,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
         kw = searchWordArray[j]
 
         #commented out and hardcoded for availability purposes 
-        start_date = "2022-01-01" #FIX ME set to 2010-01-01
+        start_date = "2010-01-01" #FIX ME set to 2010-01-01
 
         #commented out and hardcoded for testing purposes
         #end_date = "2022-10-01" #FIX ME set to todays date
