@@ -36,7 +36,7 @@ startDate = dt.datetime.strptime("2000-01-01", '%Y-%m-%d') #make start date a "d
 endDate = dt.datetime.now() #set end date to today ("datetime" object)
 
 #prompt user for stock tickers
-num_of_tweets = int(input("How many tweets do you want to pull per month (note that it takes about 5 extra seconds per 100 tweets): ")) # about 5 seconds per 100 tweets
+num_of_tweets = int(input("How many tweets do you want to pull per month (note that it takes about 15 total minutes per stock at 100 tweets per month): ")) # about 5 seconds per 100 tweets
 userInput = input("Enter stock tickers of interest: ")
 userInput = userInput.upper() #make stock ticker all capital letters
 
@@ -341,7 +341,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
 
 
 
-        #print(gtrendData)
+        print("gt done")
 
     except:
         pass
@@ -378,11 +378,11 @@ for x in stockTickerArray: #iterate over every stock ticker in array
         next_month = str((dt.datetime.strptime(start_date, '%Y-%m-%d') + relativedelta(months=+1)).date())
 
         while (dt.datetime.strptime(next_month, '%Y-%m-%d') <= dt.datetime.now()):
-            #print(start_date)
+            print(start_date)
             search_settings = (kw +' since:' + start_date +' until:' + next_month)
             i = 0 #initialize index variable
             for a,tweet in enumerate(sntwitter.TwitterSearchScraper(search_settings).get_items()):
-                if i > 100: #gets 100 different datapoints
+                if i > num_of_tweets: #gets 100 different datapoints
                     break
                 compound_score = analyzer.polarity_scores(tweet.content)['compound'] # -1(most extreme negative) and +1 (most extreme positive)
                 words = tweet.content.lower() # lower case all words
@@ -409,7 +409,8 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                     sent_dict[start_date[:7]] = round(avg,3) #set sentiment for each month searched
             #increasing search parameters by one month
             start_date = str((dt.datetime.strptime(start_date, '%Y-%m-%d') + relativedelta(months=+1)).date())
-            next_month = str((dt.datetime.strptime(next_month, '%Y-%m-%d') + relativedelta(months=+1)).date())     
+            next_month = str((dt.datetime.strptime(next_month, '%Y-%m-%d') + relativedelta(months=+1)).date())
+            i = 0
 
         #print(sent_dict)
 
