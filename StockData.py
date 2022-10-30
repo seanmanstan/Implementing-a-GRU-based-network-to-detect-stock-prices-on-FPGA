@@ -34,9 +34,15 @@ startDate = dt.datetime.strptime("2000-01-01", '%Y-%m-%d') #make start date a "d
 
 #set end date to today 
 endDate = dt.datetime.now() #set end date to today ("datetime" object)
+#prompt user for number of monthly tweets to collect.
+num_of_tweets = "uninitialized"
+while (num_of_tweets == "uninitialized" or num_of_tweets < 0 or num_of_tweets > 500):
+    try:
+        num_of_tweets = int(input("How many tweets do you want to pull per month (note that it takes about 15 total minutes per stock at 100 tweets per month): ")) # about 5 seconds per 100 tweets
+    except:
+        print("Number invalid, please enter an integer between 0 and 500")
 
 #prompt user for stock tickers
-num_of_tweets = int(input("How many tweets do you want to pull per month (note that it takes about 15 total minutes per stock at 100 tweets per month): ")) # about 5 seconds per 100 tweets
 userInput = input("Enter stock tickers of interest: ")
 userInput = userInput.upper() #make stock ticker all capital letters
 
@@ -426,7 +432,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                         sentimentColumn.append(sent_dict.get(date_in_file))
                         #print("Date in file found in dictionary!")
                     else:
-                        sentimentColumn.append("NA")
+                        sentimentColumn.append("NaN")
                 else:
                     pass #do nothing
 
