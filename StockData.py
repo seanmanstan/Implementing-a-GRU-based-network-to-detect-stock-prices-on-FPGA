@@ -66,7 +66,6 @@ while (userInput != 'Q'):
     userInput = input("Enter stock tickers of interest (or enter q to stop): ") #get next stock ticker from user
     userInput = userInput.upper()
 
-    
 #start_time = time.time()
 j = 0
 for x in stockTickerArray: #iterate over every stock ticker in array
@@ -80,8 +79,8 @@ for x in stockTickerArray: #iterate over every stock ticker in array
 
     #Macrotrends for past quarter eps data
     epsDataList = []
+    epsColumn = []
     try:
-            
         URL = "https://www.macrotrends.net/stocks/charts/" + stock_ticker + "/alphabet/eps-earnings-per-share-diluted"
         #get url where eps data is
 
@@ -126,7 +125,6 @@ for x in stockTickerArray: #iterate over every stock ticker in array
             i += 2
 
         #create column to be appended to csv after main data is created
-        epsColumn = []
         i = 0
         with open(fileName, 'r', encoding = 'utf-8') as f: #open file
             csv_reader = csv.reader(f, delimiter =",")
@@ -153,7 +151,8 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                                 break
                             else:
                                 i += 2
-    except:
+    except Exception as ex:
+        #print(ex)        
         pass
                             
 ###########################################################################################################################
@@ -163,7 +162,6 @@ for x in stockTickerArray: #iterate over every stock ticker in array
     amt_traded = []
     
     try:
-            
         URL = "http://openinsider.com/screener?s=" +  stock_ticker +   "&o=&pl=&ph=&ll=&lh=&fd=0&fdr=&td=0&tdr=&" + "fdlyl=&fdlyh=&daysago=&xp=1&xs=1&vl=&vh=&ocl=&och=&sic1=-1&sicl=100&sich=" + "9999&grp=0&nfl=&nfh=&nil=&nih=&nol=&noh=&v2l=&v2h=&oc2l=&oc2h=&sortcol=0&cnt=1000&page=1"
         page = requests.get(URL) #gets HTML from from site using its URL
         soup = BeautifulSoup(page.content, "html.parser") # this line ensures we use the right parser for HTML
@@ -251,7 +249,8 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                                 amt_of_sells.append(sellCounter)
                                 amt_traded.append(transactionCounter)
 
-    except:
+    except Exception as ex:
+        #print(ex)        
         pass
 
     
@@ -262,9 +261,9 @@ for x in stockTickerArray: #iterate over every stock ticker in array
     # $1 in (base_year) is roughly equivalent (in purchasing power) to (inflated amount) in (whatever year you are looking at)
 
     inflationDataList = []
+    inflationColumn = []
     
-    try:
-        
+    try: 
         url = "https://www.officialdata.org/us/inflation/" + str(startDate.year) + "?amount=1#buying-power"
         page = requests.get(url) #gets HTML from from site using its URL
         soup = BeautifulSoup(page.content, "html.parser") # this line ensures we use the right parser for HTML\
@@ -290,7 +289,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
         #        inflation_rate = x.text.splitlines()[3]
         #        inflationDataList.extend((year, dollar_value, inflation_rate))
 
-        inflationColumn = []  
+          
         i=0
         with open(fileName, 'r', encoding = 'utf-8') as f: #open file
             csv_reader = csv.reader(f, delimiter =",")
@@ -305,7 +304,8 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                         else:
                             i += 1
         
-    except:
+    except Exception as ex:
+        print(ex)        
         pass
                         
 ###########################################################################################################################
@@ -313,7 +313,6 @@ for x in stockTickerArray: #iterate over every stock ticker in array
     
     gtrendData = []
     try:
-        
         pytrends = TrendReq(hl='en-US', tz=360) #connect to google
         kw_list = [stock_ticker] #list of keywords (doing one at a time) (may  generate 409 error if too many tickers)
 
@@ -346,10 +345,8 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                                 i += 1
 
 
-
-        print("gt done")
-
-    except:
+    except Exception as ex:
+        #print(ex)        
         pass
     
 ###########################################################################################################################
@@ -437,8 +434,8 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                     pass #do nothing
 
     except Exception as ex:
-        print(ex)        
-        #pass
+        #print(ex)        
+        pass
 
                             
 ###########################################################################################################################
