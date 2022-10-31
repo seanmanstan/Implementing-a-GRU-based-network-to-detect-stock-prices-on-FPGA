@@ -543,7 +543,7 @@ if __name__=="__main__":
     root = GUI()
     root.mainloop()
     print("We are now back inside of the main line")
-    os.system('python GRU.py ' + stockName)
+    os.system('python GRU_GUIversion2.py ' + stockName)
 
 
 
