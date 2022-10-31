@@ -36,11 +36,15 @@ startDate = dt.datetime.strptime("2000-01-01", '%Y-%m-%d') #make start date a "d
 endDate = dt.datetime.now() #set end date to today ("datetime" object)
 #prompt user for number of monthly tweets to collect.
 num_of_tweets = "uninitialized"
-while (num_of_tweets == "uninitialized" or num_of_tweets < 0 or num_of_tweets > 500):
+print("How many tweets do you want to pull per month? (number must be an integer between 1 and 500 inclusive):") #note that it takes about 15 total minutes per stock at 100 tweets per month
+while (num_of_tweets == "uninitialized"):
     try:
-        num_of_tweets = int(input("How many tweets do you want to pull per month (note that it takes about 15 total minutes per stock at 100 tweets per month): ")) # about 5 seconds per 100 tweets
-    except:
-        print("Number invalid, please enter an integer between 0 and 500")
+        num_of_tweets = int(input()) #raises error if float is input because it's seen as a string first
+        if (num_of_tweets < 1 or num_of_tweets > 500):
+            raise ValueError("input not within range")
+    except Exception as ex:
+        #print(ex)
+        print("Number invalid, please enter an integer between 1 and 500:")
 
 #prompt user for stock tickers
 userInput = input("Enter stock tickers of interest: ")
@@ -152,7 +156,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                             else:
                                 i += 2
     except Exception as ex:
-        #print(ex)        
+        print("There was an exception (", ex, ") in the EPS module, this attribute will be ignored.")        
         pass
                             
 ###########################################################################################################################
@@ -250,7 +254,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                                 amt_traded.append(transactionCounter)
 
     except Exception as ex:
-        #print(ex)        
+        print("There was an exception (", ex, ") in the IT module, these attributes will be ignored.")        
         pass
 
     
@@ -305,7 +309,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                             i += 1
         
     except Exception as ex:
-        print(ex)        
+        print("There was an exception (",ex, ") in the IR module, this attribute will be ignored.")        
         pass
                         
 ###########################################################################################################################
@@ -346,7 +350,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
 
 
     except Exception as ex:
-        #print(ex)        
+        print("There was an exception (", ex, ") in the GT module, this attribute will be ignored.")        
         pass
     
 ###########################################################################################################################
@@ -434,7 +438,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                     pass #do nothing
 
     except Exception as ex:
-        #print(ex)        
+        print("There was an exception (", ex, ") in the SA module, this attribute will be ignored.")        
         pass
 
                             
