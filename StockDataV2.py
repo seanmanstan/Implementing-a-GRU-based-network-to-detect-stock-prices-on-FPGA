@@ -47,7 +47,7 @@ while (num_of_tweets == "uninitialized"):
         print("Number invalid, please enter an integer between 1 and 500:")
 
 #prompt user for stock tickers
-userInput = input("Enter stock tickers of interest: ")
+userInput = input("Enter stock tickers of interest (or enter q to quit): ")
 userInput = userInput.upper() #make stock ticker all capital letters
 
 stockTickerArray = [] #empty list of stock tickers
@@ -57,7 +57,7 @@ while (userInput != 'Q'):
     try:
         currentData = pdr.DataReader(userInput, 'yahoo', startDate, endDate) #try to get main stock data from yahoo finance
     except:
-        print ("Stock ticker invalid please enter another or press 'q' to stop: ")
+        print ("Stock ticker invalid please enter another or press 'q' to quit: ")
     else:
         stockTickerArray.append(userInput) # add valid stock ticker to list of valid stick tickers
         searchWord = input("Enter corresponding search word: ")
@@ -136,20 +136,24 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                 date = row[0]
                 if (date != "Date"): #ignore the header column
                     fileDate = dt.datetime.strptime(date, '%Y-%m-%d') #convert date in file to datetime object       
-                    if (fileDate < (earliestEpsDate - dt.timedelta(weeks=13))): #check if date in the file is before the earliest quarter we have data for
+                    if (fileDate < (earliestEpsDate)): #check if date in the file is before the earliest quarter we have data for
                         epsColumn.append("NaN") 
                     elif (fileDate > latestEpsDate): #check if date in the file is a date that is in the current fiscal quarter
-                        epsColumn.append("NaN")
+                        epsColumn.append(epsDataList[1])
                     else: #we have data for these dates
+                        #WE ARE HERE
+                        
+                        
+                        
+                        
+                        
                         while i < (len(epsDataList) - 2 ):
-                            if (fileDate < earliestEpsDate):
-                                epsColumn.append(epsDataList[-1]) #end of the list is where the earliest data is stored
-                                break
+                            #end of the list is where the earliest data is stored
                             #format of list is "Date (\n) Price (\n) Date (\n)....(\n) Price"
                             tempDateRecent = dt.datetime.strptime(epsDataList[i], '%Y-%m-%d')
                             tempDatePast = dt.datetime.strptime(epsDataList[i+2], '%Y-%m-%d')
                             if (tempDateRecent >= fileDate >= tempDatePast):
-                                epsColumn.append(epsDataList[i+1])
+                                epsColumn.append(epsDataList[i+3])
                                 if (i != 0):
                                     i = i-2
                                 break
@@ -223,9 +227,9 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                             amt_of_sells.append("NaN")
                             amt_traded.append("NaN")
                         elif (fileDate > trade_dates[0]): #if date in file is more recent than latest date
-                            amt_of_buys.append("NaN")
-                            amt_of_sells.append("NaN")
-                            amt_traded.append("NaN")
+                            amt_of_buys.append(0)
+                            amt_of_sells.append(0)
+                            amt_traded.append(0)
                         else:
                             try:
                                 index = trade_dates.index(fileDate) #find at what index is the file date in the trade dates list
@@ -327,6 +331,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
 
         pytrends.build_payload(kw_list, cat=0, timeframe= trend_time_frame, geo='', gprop='') #build payload
         data = pytrends.interest_over_time() #put data in df object
+        #print(data)
 
         i = 0
         with open(fileName, 'r', encoding = 'utf-8') as f: #open file
@@ -336,14 +341,19 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                 if (date != "Date"): #ignore the header column
                     fileDate = dt.datetime.strptime(date, '%Y-%m-%d') #convert date in file to datetime object       
                     if (fileDate < data.index[0]): #check if date in the file is before the earliest date we have data for
-                        gtrendData.append("NaN") 
-                    elif (fileDate > data.index[-1]): #check if date in the file is a date that is too recent
                         gtrendData.append("NaN")
+                        
+                        
+                        
+                        
+                    elif (fileDate > data.index[-1]): #check if date in the file is a date that is too recent
+                        gtrendData.append(data.iloc[-1,0])
                         #print("file date = ", fileDate, "trend date = ", data.index[-1])
                     else: #we have data for these dates
-                        while i < (len(data)):
+                        while i < (len(data)-1):
                             if (data.index[i].month == fileDate.month):
-                                gtrendData.append(data.iloc[i,0])
+                                #print("data.index[i].month = ", data.index[i].month,"data.iloc[i,0]= ",data.iloc[i,0] )
+                                gtrendData.append(data.iloc[i+1,0])
                                 break
                             else:
                                 i += 1
@@ -385,7 +395,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
         next_month = str((dt.datetime.strptime(start_date, '%Y-%m-%d') + relativedelta(months=+1)).date())
 
         while (dt.datetime.strptime(next_month, '%Y-%m-%d') <= dt.datetime.now()):
-            print(start_date)
+            #print(start_date)
             search_settings = (kw +' since:' + start_date +' until:' + next_month)
             i = 0 #initialize index variable
             for a,tweet in enumerate(sntwitter.TwitterSearchScraper(search_settings).get_items()):
@@ -430,18 +440,18 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                     date_in_file = row[0][:7]
                     #print(row[0][:7])
                     if (date_in_file in sent_dict):
+                        latest_month_in_file = date_in_file
                         sentimentColumn.append(sent_dict.get(date_in_file))
                         #print("Date in file found in dictionary!")
                     else:
-                        sentimentColumn.append("NaN")
+                        sentimentColumn.append(sent_dict.get(latest_month_in_file))
                 else:
                     pass #do nothing
 
     except Exception as ex:
         print("There was an exception (", ex, ") in the SA module, this attribute will be ignored.")        
         pass
-
-                            
+    
 ###########################################################################################################################
 #################################################APPEND EVERYTHING#########################################################
     
