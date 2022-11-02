@@ -53,7 +53,11 @@ class GUI(Tk):
 
     def __init__(self):
         super().__init__()
+
         self.title("GBSPS Window")
+
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
         #root.configure(background="darkgrey")
         self.geometry("900x525")
         self.resizable(width=False, height=False)
@@ -82,7 +86,7 @@ class GUI(Tk):
 
         if(not (os.path.exists("saved_GRU_"+stockName+"_Model.h5"))):  ## Shows up in this format saved_GRU_F_Model.h5
             print("No trained model exists in the directory")
-            root.destroy()
+            self.RunTheGRU()
             #RunGRUmodelTraining()
             return
 
@@ -90,7 +94,6 @@ class GUI(Tk):
         predictedValuesList = MakePrediction(stockName)
         # threading.Thread(target=lambda:MakePrediction(stockName)).start()
         #sleep(5)
-
 
         file_name_used = stockName + '.csv'
 
@@ -148,7 +151,55 @@ class GUI(Tk):
         top.title("Help Window")
         Label(top, text="The prediction for "+stockName+ " is $"+str(round(predictedValuesList[-1][0],2)), font=('Arial 12')).place(x=10, y=10)
 
+##Bug inside this KillTheGUI function that causes it not to show the countdown... but still functions
+    def KillTheGUI(self):
+        global BranchtoGRU
+        BranchtoGRU = 1
+        #self.greeting_Frame.config(text="The GUI will be terminated in: 3")
 
+        self.GRUOptionsFrame.grid_slaves(row=1, column=0)[0].destroy()
+        self.GRUOptionsFrame.grid_slaves(row=1, column=1)[0].destroy()
+        self.GRUOptionsFrame.pack_forget()
+        self.GRUOptionsFrame.destroy()
+
+        self.greeting_Frame.config(text="The GUI will be terminated in: 3")
+        sleep(1)
+        self.greeting_Frame.config(text="The GUI will be terminated in: 2")
+        sleep(1)
+        self.greeting_Frame.config(text="The GUI will be terminated in: 1")
+        sleep(1)
+        root.destroy()
+
+
+    def RunTheGRU(self):
+        global stockName
+        self.greeting_Frame.config(text="Alert: No Trained Model Found")
+
+        self.OptionFrame.grid_slaves(row=0, column=0)[0].destroy()
+        self.OptionFrame.grid_slaves(row=1, column=0)[0].destroy()
+        self.OptionFrame.grid_slaves(row=0, column=1)[0].destroy()
+        self.OptionFrame.pack_forget()
+        self.OptionFrame.destroy()
+
+        self.GRUOptionsFrame = Label(master=root, bg="darkgrey")
+        self.GRUOptionsFrame.pack()
+
+        self.GRUNotificationFrame = Label(master=self.GRUOptionsFrame, bg='darkgrey', text = "There is no trained model in the directory for "+stockName+".\nIn " +
+        "order to make a prediction a model must be trained. To save device resources the GUI will be closed for model training.\n"+
+        "Once the GUI is closed this action cannot be undone. Would you like to proceed with training a model?"
+        , font=('calibre',12,'normal')).grid(row=0,column=0,columnspan=2)
+
+
+        self.NoGRU_btn = Button(master = self.GRUOptionsFrame, text = 'No', font=('calibre',12,'normal'), width = 15, command=self.BacktoOptsFromRunTheGRU).grid(row=1,column=1, sticky= "NS")
+        self.YesGRU_btn = Button(master = self.GRUOptionsFrame, text='Yes',font=('calibre',12,'normal'), width = 15, command=self.KillTheGUI).grid(row=1,column=0, sticky= "NS")
+        #root.destroy()
+
+    def BacktoOptsFromRunTheGRU(self):
+        self.GRUOptionsFrame.grid_slaves(row=1, column=0)[0].destroy()
+        self.GRUOptionsFrame.grid_slaves(row=1, column=1)[0].destroy()
+        self.GRUOptionsFrame.pack_forget()
+        self.GRUOptionsFrame.destroy()
+        self.build_optionsMenu()
 
 
     def returnToOpts(self):
@@ -220,7 +271,7 @@ class GUI(Tk):
 
         self.insiderData = Label(self.OptionFrame, text=RecentinsiderTrade,fg= 'white', bg ='#800000', font='Calibri 12', wraplength=300).grid(row=0,column=2, sticky= "NWE",pady=2, columnspan=2)
         self.EPSDataLabel = Label(self.OptionFrame, text=EPSStatement, bg ='#800000', fg= 'white', font='Calibri 12', wraplength=300).grid(row=1,column=2, sticky= "NWE", columnspan=2)
-        self.labelimage = Label(master = self.OptionFrame, image = photo)
+        self.labelimage = Label(master=self.OptionFrame, image = photo)
         self.labelimage.image = photo
         self.labelimage.grid(row=0, column=0, columnspan=2, rowspan=2, pady=2, padx=2)
         #Label(top, text= "Hello World!", font=('Mistral 18 bold')).place(x=150,y=80)
@@ -281,12 +332,9 @@ class GUI(Tk):
         dataset['DateUse'] = pd.to_datetime(dataset['Day'], format='%j').dt.strftime('%m-%d')
 
         figure, (ax1, ax2) = plt.subplots(2, 1)
-        #figure.autolayout :True
         ax1.plot(dataset['Day'], dataset['Close'], linewidth=2.0)
         ax1.set_title(stockName + " Stock Values")
-        #ax1.set_xlabel('Day of year')
         ax1.set_ylabel('Value at Close USD:$')
-
         ax2.bar(dataset['Day'], dataset['Volume'])
         ax2.set_xlabel('Day of year')
         ax2.set_ylabel('Volume Traded')
@@ -336,7 +384,6 @@ class GUI(Tk):
         #figure.autolayout :True
         ax1.plot(dataset['Day'], dataset['Close'], linewidth=2.0)
         ax1.set_title(stockName + " Stock Values")
-        #ax1.set_xlabel('Day of year')
         ax1.set_ylabel('Value at Close USD:$')
 
         ax2.bar(dataset['Day'], dataset['Volume'])
@@ -435,9 +482,11 @@ class GUI(Tk):
                         break
                     if( (dt.datetime.today().weekday() == 6) or (dt.datetime.today().weekday() == 5)):
                         break
-                    if((dt.datetime.today().weekday() == 0)):
-                        if(datetime.now().time().hour < 17):
-                            break
+                    #if((dt.datetime.today().weekday() == 0)):
+                    if(datetime.now().time().hour < 17):
+                        print("Updating overnight so dates will be different")
+                        break
+
                 self.working_Frame.config(text = loadTextDone)
                 self.working_Frame.pack_forget()
                 self.working_Frame.destroy()
@@ -529,6 +578,12 @@ class GUI(Tk):
         #threading.Thread(target=callFile).start()
         threading.Thread(target=self.loadingData).start()
 
+    def on_closing(self):
+        global setWindowClosed
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            root.destroy()
+            setWindowClosed = 1
+
 
 #*******************************************************************************************************************************
 #*******************************************************************************************************************************
@@ -537,13 +592,25 @@ class GUI(Tk):
 #*******************************************************************************************************************************
 #*******************************************************************************************************************************
 
+
+setWindowClosed = 0
+BranchtoGRU = 0
 
 if __name__=="__main__":
 
-    root = GUI()
-    root.mainloop()
-    print("We are now back inside of the main line")
-    os.system('python GRU_GUIversion2.py ' + stockName)
+    while(1):
+        if not setWindowClosed:
+            root = GUI()
+            root.mainloop()
+            print("We are now back inside of the main line")
+            if BranchtoGRU:
+                del root
+                print("Entering GRU call")
+                os.system('python GRU.py ' + stockName)
+                sleep(1)
+                BranchtoGRU = 0
+        else:
+            break
 
 
 
