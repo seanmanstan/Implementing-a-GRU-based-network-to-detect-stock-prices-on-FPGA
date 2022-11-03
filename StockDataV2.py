@@ -440,7 +440,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                     date_in_file = row[0][:7]
                     #print(row[0][:7])
                     if (date_in_file in sent_dict):
-                        latest_month_in_file = date_in_file
+                        #latest_month_in_file = date_in_file # not needed?
                         sentimentColumn.append(sent_dict.get(date_in_file))
                         #print("Date in file found in dictionary!")
                     else:
