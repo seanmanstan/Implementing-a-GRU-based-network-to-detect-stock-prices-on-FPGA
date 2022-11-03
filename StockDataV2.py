@@ -444,7 +444,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                         sentimentColumn.append(sent_dict.get(date_in_file))
                         #print("Date in file found in dictionary!")
                     else:
-                        sentimentColumn.append(sent_dict.get(latest_month_in_file))
+                        sentimentColumn.append("NaN")
                 else:
                     pass #do nothing
 
