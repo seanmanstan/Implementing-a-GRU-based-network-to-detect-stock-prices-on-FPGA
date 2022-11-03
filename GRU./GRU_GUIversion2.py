@@ -657,7 +657,7 @@ for j in range(len(options)):
 
         Y_test = Descaler(Y_test, Factor)
 
-        plot_predictions(Y_test, GRU_predicted_stock_price, lookback_days)
+        #plot_predictions(Y_test, GRU_predicted_stock_price, lookback_days)
         #Plot the predictions, the final attribute of this function allows for shifting the plots to see what occured before
             # the displayed prediction
 
