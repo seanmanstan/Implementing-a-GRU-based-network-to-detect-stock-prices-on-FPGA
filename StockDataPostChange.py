@@ -47,7 +47,7 @@ while (num_of_tweets == "uninitialized"):
         print("Number invalid, please enter an integer between 1 and 500:")
 
 #prompt user for stock tickers
-userInput = input("Enter stock tickers of interest (or enter q to quit): ")
+userInput = input("Enter stock ticker of interest (or enter q to quit): ")
 userInput = userInput.upper() #make stock ticker all capital letters
 
 stockTickerArray = [] #empty list of stock tickers
@@ -65,7 +65,7 @@ while (userInput != 'Q'):
 
         currentFileName = userInput + ".csv" #create base file
         with open(currentFileName, 'w', encoding= 'UTF8' ) as f: #this writes the current stock tickers data to a csv file
-            currentData.to_csv(currentFileName) #save data retriebed from yahoo finance (dataframe object) to the base csv
+            currentData.to_csv(currentFileName) #save data retrieved from yahoo finance (dataframe object) to the base csv
             
     userInput = input("Enter stock tickers of interest (or enter q to stop): ") #get next stock ticker from user
     userInput = userInput.upper()
@@ -77,7 +77,11 @@ for x in stockTickerArray: #iterate over every stock ticker in array
     print("Getting" ,stock_ticker, "stock data..." )
 
     fileName = stock_ticker + ".csv" #current file name is based on the current stock ticker
-
+    
+    with open(fileName, 'r', encoding= 'UTF8' ) as f:
+            #print(sum(1 for line in f))
+            
+            
 ###########################################################################################################################
 ################################################################EPS########################################################
 
@@ -342,16 +346,18 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                     fileDate = dt.datetime.strptime(date, '%Y-%m-%d') #convert date in file to datetime object       
                     if (fileDate < data.index[0]): #check if date in the file is before the earliest date we have data for
                         gtrendData.append("NaN")
+                        #print(fileDate, " < ", data.index[0])
                         
                         
                         
-                        
-                    elif (fileDate > data.index[-1]): #check if date in the file is a date that is too recent
+                    elif (fileDate >= data.index[-1]): #check if date in the file is a date that is too recent
                         gtrendData.append(data.iloc[-1,0])
+                        #print(fileDate, " > ", data.index[-1])
                         #print("file date = ", fileDate, "trend date = ", data.index[-1])
                     else: #we have data for these dates
                         while i < (len(data)-1):
                             if (data.index[i].month == fileDate.month):
+                                #print(fileDate, " = ", data.index[i])
                                 #print("data.index[i].month = ", data.index[i].month,"data.iloc[i,0]= ",data.iloc[i,0] )
                                 gtrendData.append(data.iloc[i+1,0])
                                 break
@@ -359,6 +365,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                                 i += 1
 
 
+        #print(gtrendData)
     except Exception as ex:
         print("There was an exception (", ex, ") in the GT module, this attribute will be ignored.")        
         pass
@@ -373,7 +380,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
         kw = searchWordArray[j]
 
         #commented out and hardcoded for availability purposes 
-        start_date = "2010-01-01" #FIX ME set to 2010-01-01
+        start_date = "2022-01-01" #FIX ME set to 2010-01-01
 
         #commented out and hardcoded for testing purposes
         #end_date = "2022-10-01" #FIX ME set to todays date
@@ -458,30 +465,37 @@ for x in stockTickerArray: #iterate over every stock ticker in array
     df = pd.read_csv(fileName)
     
     if len(amt_of_buys) != 0:
+        #print(len(amt_of_buys))
         buys_column = pd.DataFrame({'Buys': amt_of_buys})
         df = df.merge(buys_column, left_index = True, right_index = True)
     
     if len(amt_of_sells) != 0:
+        #print(len(amt_of_sells))
         sells_column = pd.DataFrame({'Sells': amt_of_sells})
         df = df.merge(sells_column, left_index = True, right_index = True)
 
     if len(amt_traded) != 0:
+        #print(len(amt_traded))
         traded_column = pd.DataFrame({'Traded': amt_traded})
         df = df.merge(traded_column, left_index = True, right_index = True)
 
     if len(epsColumn) != 0:
+        #print(len(epsColumn))
         eps_column = pd.DataFrame({'EPS': epsColumn})
         df = df.merge(eps_column, left_index = True, right_index = True)
 
     if len(inflationColumn) != 0:
+        #print(len(inflationColumn))
         inflation_column = pd.DataFrame({'IR': inflationColumn})
         df = df.merge(inflation_column, left_index = True, right_index = True)
    
     if len(gtrendData) != 0:
+        #print(len(gtrendData))
         gt_column = pd.DataFrame({'GT': gtrendData})
         df = df.merge(gt_column, left_index = True, right_index = True)
 
     if len(sentimentColumn) != 0:
+        #print(len(sentimentColumn))
         sentiment_Column = pd.DataFrame({'SA': sentimentColumn})
         df = df.merge(sentiment_Column, left_index = True, right_index = True)
     
