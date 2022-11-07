@@ -47,7 +47,7 @@ while (num_of_tweets == "uninitialized"):
         print("Number invalid, please enter an integer between 1 and 500:")
 
 #prompt user for stock tickers
-userInput = input("Enter stock tickers of interest: ")
+userInput = input("Enter stock ticker of interest: ")
 userInput = userInput.upper() #make stock ticker all capital letters
 
 stockTickerArray = [] #empty list of stock tickers
@@ -65,7 +65,7 @@ while (userInput != 'Q'):
 
         currentFileName = userInput + ".csv" #create base file
         with open(currentFileName, 'w', encoding= 'UTF8' ) as f: #this writes the current stock tickers data to a csv file
-            currentData.to_csv(currentFileName) #save data retriebed from yahoo finance (dataframe object) to the base csv
+            currentData.to_csv(currentFileName) #save data retrieved from yahoo finance (dataframe object) to the base csv
             
     userInput = input("Enter stock tickers of interest (or enter q to stop): ") #get next stock ticker from user
     userInput = userInput.upper()
@@ -77,6 +77,10 @@ for x in stockTickerArray: #iterate over every stock ticker in array
     print("Getting" ,stock_ticker, "stock data..." )
 
     fileName = stock_ticker + ".csv" #current file name is based on the current stock ticker
+    
+    
+    with open(fileName, 'r', encoding= 'UTF8' ) as f:
+            #print(sum(1 for line in f))
 
 ###########################################################################################################################
 ################################################################EPS########################################################
@@ -363,7 +367,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
         kw = searchWordArray[j]
 
         #commented out and hardcoded for availability purposes 
-        start_date = "2010-01-01" #FIX ME set to 2010-01-01
+        start_date = "2022-01-01" #FIX ME set to 2010-01-01
 
         #commented out and hardcoded for testing purposes
         #end_date = "2022-10-01" #FIX ME set to todays date
@@ -385,7 +389,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
         next_month = str((dt.datetime.strptime(start_date, '%Y-%m-%d') + relativedelta(months=+1)).date())
 
         while (dt.datetime.strptime(next_month, '%Y-%m-%d') <= dt.datetime.now()):
-            print(start_date)
+            #print(start_date)
             search_settings = (kw +' since:' + start_date +' until:' + next_month)
             i = 0 #initialize index variable
             for a,tweet in enumerate(sntwitter.TwitterSearchScraper(search_settings).get_items()):
@@ -448,30 +452,37 @@ for x in stockTickerArray: #iterate over every stock ticker in array
     df = pd.read_csv(fileName)
     
     if len(amt_of_buys) != 0:
+        #print(len(amt_of_buys))
         buys_column = pd.DataFrame({'Buys': amt_of_buys})
         df = df.merge(buys_column, left_index = True, right_index = True)
     
     if len(amt_of_sells) != 0:
+        #print(len(amt_of_sells))
         sells_column = pd.DataFrame({'Sells': amt_of_sells})
         df = df.merge(sells_column, left_index = True, right_index = True)
 
     if len(amt_traded) != 0:
+        #print(len(amt_traded))
         traded_column = pd.DataFrame({'Traded': amt_traded})
         df = df.merge(traded_column, left_index = True, right_index = True)
 
     if len(epsColumn) != 0:
+        #print(len(epsColumn))
         eps_column = pd.DataFrame({'EPS': epsColumn})
         df = df.merge(eps_column, left_index = True, right_index = True)
 
     if len(inflationColumn) != 0:
+        #print(len(inflationColumn))
         inflation_column = pd.DataFrame({'IR': inflationColumn})
         df = df.merge(inflation_column, left_index = True, right_index = True)
    
     if len(gtrendData) != 0:
+        #print(len(gtrendData))
         gt_column = pd.DataFrame({'GT': gtrendData})
         df = df.merge(gt_column, left_index = True, right_index = True)
 
     if len(sentimentColumn) != 0:
+        #print(len(sentimentColumn))
         sentiment_Column = pd.DataFrame({'SA': sentimentColumn})
         df = df.merge(sentiment_Column, left_index = True, right_index = True)
     
