@@ -399,8 +399,11 @@ characteristics[" 1"] = ['High', 'Low', 'Open', 'EPS', 'Day']
 #characteristics[" 2"] = ['High', 'Low', 'Open', 'Day']
 characteristics[" 3"] = ['High', 'Low', 'Day']
 characteristics[" 4"] = ['High', 'Low', 'Open']
-
-
+characteristics[" 13"] = ['High', 'Low', 'IR']
+characteristics[" 23"] = ['High', 'Low', 'IR', 'PercentChange']
+characteristics[" 50"] = ['High','GT', 'Volume']
+characteristics[" 82"] = ['High', 'Low', 'Open', 'Day', 'IR','PercentChange', 'Volume']
+characteristics[" 70"] = ['High', 'Volume']
 '''
 characteristics[" 8"] = ['High', 'Low']
 characteristics[" 9"] = ['High', 'Low', 'EPS', 'Day']
@@ -409,7 +412,7 @@ characteristics[" 10"] = ['High']
 characteristics[" 11"] = ['High', 'Low', 'Open', 'EPS', 'Day', 'IR']
 characteristics[" 91"] = ['High', 'Low', 'Open', 'Day', 'IR']
 characteristics[" 12"] = ['High', 'Low', 'EPS', 'Day', 'IR']
-characteristics[" 13"] = ['High', 'Low', 'IR']
+
 characteristics[" 14"] = ['High', 'Low', 'Day', 'IR']
 
 characteristics[" 15"] = ['High', 'Low', 'Open', 'EPS', 'Day','PercentChange']
@@ -421,7 +424,7 @@ characteristics[" 19"] = ['High', 'Low', 'Day', 'IR', 'PercentChange']
 characteristics[" 20"] = ['High', 'Low', 'Open', 'EPS', 'Day', 'IR','PercentChange']
 characteristics[" 21"] = ['High', 'Low', 'Open', 'Day', 'IR','PercentChange']
 characteristics[" 22"] = ['High', 'Low', 'EPS', 'Day', 'IR','PercentChange']
-characteristics[" 23"] = ['High', 'Low', 'IR', 'PercentChange']
+
 
 
 ##**********************************************************************
@@ -457,7 +460,7 @@ characteristics[" 47"] = ['High', 'Low', 'Open', 'GT', 'Volume']
 
 characteristics[" 48"] = ['High', 'Low', 'GT', 'Volume']
 characteristics[" 49"] = ['High', 'Low', 'EPS', 'Day', 'GT', 'Volume']
-characteristics[" 50"] = ['High','GT', 'Volume']
+
 
 characteristics[" 51"] = ['High', 'Low', 'Open', 'EPS', 'Day', 'IR', 'GT', 'Volume']
 characteristics[" 52"] = ['High', 'Low', 'Open', 'Day', 'IR', 'GT', 'Volume']
@@ -478,7 +481,7 @@ characteristics[" 64"] = ['High', 'Low', 'Open', 'Volume']
 
 characteristics[" 68"] = ['High', 'Low', 'Volume']
 characteristics[" 69"] = ['High', 'Low', 'EPS', 'Day', 'Volume']
-characteristics[" 70"] = ['High', 'Volume']
+
 
 characteristics[" 71"] = ['High', 'Low', 'Open', 'EPS', 'Day', 'IR', 'Volume']
 characteristics[" 72"] = ['High', 'Low', 'Open', 'Day', 'IR', 'Volume']
@@ -493,7 +496,7 @@ characteristics[" 79"] = ['High', 'Low', 'Open','PercentChange', 'Volume']
 characteristics[" 80"] = ['High', 'Low', 'Day', 'IR', 'PercentChange', 'Volume']
 
 characteristics[" 81"] = ['High', 'Low', 'Open', 'EPS', 'Day', 'IR','PercentChange', 'Volume']
-characteristics[" 82"] = ['High', 'Low', 'Open', 'Day', 'IR','PercentChange', 'Volume']
+
 characteristics[" 83"] = ['High', 'Low', 'EPS', 'Day', 'IR','PercentChange', 'Volume']
 characteristics[" 84"] = ['High', 'Low', 'IR', 'PercentChange', 'Volume']
 '''
