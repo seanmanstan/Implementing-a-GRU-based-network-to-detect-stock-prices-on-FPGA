@@ -78,7 +78,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
 
     fileName = stock_ticker + ".csv" #current file name is based on the current stock ticker
     
-    with open(fileName, 'r', encoding= 'UTF8' ) as f:
+    #with open(fileName, 'r', encoding= 'UTF8' ) as f:
             #print(sum(1 for line in f))
             
             
