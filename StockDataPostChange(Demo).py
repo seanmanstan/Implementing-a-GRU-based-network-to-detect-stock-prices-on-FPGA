@@ -381,7 +381,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
         kw = searchWordArray[j]
 
         #commented out and hardcoded for availability purposes 
-        start_date = "2010-01-01" #FIX ME set to 2010-01-01
+        start_date = "2022-01-01" #FIX ME set to 2010-01-01
 
         #commented out and hardcoded for testing purposes
         #end_date = "2022-10-01" #FIX ME set to todays date
