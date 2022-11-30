@@ -643,7 +643,7 @@ for j in range(len(options)):
         #Model1.summary()  ## This will print the structure of the GRU that has been built
 
 
-        Model1.fit(X_train_lookback, Y_train_ready, validation_split=0.1, epochs = 5) # ,batch_size=1
+        Model1.fit(X_train_lookback, Y_train_ready, validation_split=0.1, epochs = 10) # ,batch_size=1
 
 
         #train the model using the datasets, validation split will take a random 10% of the data out of training and use it
