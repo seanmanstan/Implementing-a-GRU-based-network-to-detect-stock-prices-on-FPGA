@@ -43,16 +43,16 @@ def Data_Scraper(userInput, startDate, endDate, Exceptions):
         #set end date to today
         #endDate = dt.datetime.now() #set end date to today ("datetime" object)
         #prompt user for number of monthly tweets to collect.
-        num_of_tweets = "uninitialized"
-        print("How many tweets do you want to pull per month? (number must be an integer between 1 and 500 inclusive):") #note that it takes about 15 total minutes per stock at 100 tweets per month
-        while (num_of_tweets == "uninitialized"):
-            try:
-                num_of_tweets = int(input()) #raises error if float is input because it's seen as a string first
-                if (num_of_tweets < 1 or num_of_tweets > 500):
-                    raise ValueError("input not within range")
-            except Exception as ex:
-                #print(ex)
-                print("Number invalid, please enter an integer between 1 and 500:")
+        num_of_tweets = 15 #"uninitialized"
+        #print("How many tweets do you want to pull per month? (number must be an integer between 1 and 500 inclusive):") #note that it takes about 15 total minutes per stock at 100 tweets per month
+        #while (num_of_tweets == "uninitialized"):
+        #    try:
+        #        num_of_tweets = int(input()) #raises error if float is input because it's seen as a string first
+        #        if (num_of_tweets < 1 or num_of_tweets > 500):
+        #            raise ValueError("input not within range")
+        #    except Exception as ex:
+        #        #print(ex)
+        #        print("Number invalid, please enter an integer between 1 and 500:")
 
         #prompt user for stock tickers
         #userInput = userInput #input("Enter stock ticker of interest (or enter q to quit): ")
@@ -68,7 +68,7 @@ def Data_Scraper(userInput, startDate, endDate, Exceptions):
             print ("Stock ticker invalid please enter another or press 'q' to quit: ")
         else:
             stockTickerArray.append(userInput) # add valid stock ticker to list of valid stick tickers
-            searchWord = input("Enter corresponding search word: ")
+            searchWord = userInput #input("Enter corresponding search word: ")
             searchWordArray.append(searchWord) # add valid search word to list
 
             currentFileName = userInput + ".csv" #create base file
