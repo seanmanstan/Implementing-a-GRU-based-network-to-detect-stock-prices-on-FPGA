@@ -16,7 +16,7 @@ import pandas as pd
 from tkinter import messagebox
 import datetime as dt
 
-from Data_Scraper import *
+from backend import *
 #from backend import *
 
 ## change this to backend for the known working version
