@@ -703,7 +703,7 @@ if __name__=="__main__":
             if BranchtoGRU:
                 del root
                 print("Entering GRU call")
-                os.system('python GRU_GUIversion2 ' + stockName)
+                os.system('python GRU_GUIversion2.py ' + stockName)
                 sleep(1)
                 BranchtoGRU = 0
         else:
