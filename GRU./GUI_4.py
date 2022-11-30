@@ -572,7 +572,7 @@ class GUI(Tk):
             else:
                 try:
                     endDate = dt.datetime.now() #set end date to today ("datetime" object)
-                    threading.Thread(target=lambda:Data_Scraper(stockName, permanentStartDate, endDate, ExceptionsList)).start()
+                    threading.Thread(target=lambda:Data_Scraper(stockName, permanentStartDate, endDate)).start()
                 except Exception as e:
                     self.working_Frame.config(text = "Something Went Wrong :( \nReturning Home")
                     print(e)
