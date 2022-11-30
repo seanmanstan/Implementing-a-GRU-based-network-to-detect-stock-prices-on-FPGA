@@ -375,7 +375,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
 ##################################################Sentiment Analysis#######################################################
     sentimentColumn = []
     try:
-        exclusion_list = ['listen', 'add', 'swear'] # create a blacklist of words
+        exclusion_list = ['null', 'null'] # create a blacklist of words
         analyzer = SentimentIntensityAnalyzer()
 
         kw = searchWordArray[j]
