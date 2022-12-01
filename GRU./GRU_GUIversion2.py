@@ -403,7 +403,14 @@ characteristics[" 13"] = ['High', 'Low', 'IR']
 characteristics[" 23"] = ['High', 'Low', 'IR', 'PercentChange']
 characteristics[" 50"] = ['High','GT', 'Volume']
 characteristics[" 82"] = ['High', 'Low', 'Open', 'Day', 'IR','PercentChange', 'Volume']
-characteristics[" 70"] = ['High', 'Volume']
+
+characteristics[" 8"] = ['High', 'Low']
+characteristics[" 9"] = ['High', 'Low', 'EPS', 'Day']
+characteristics[" 14"] = ['High', 'Low', 'Day', 'IR']
+characteristics[" 17"] = ['High', 'Low', 'Day','PercentChange']
+characteristics[" 15"] = ['High', 'Low', 'Open', 'EPS', 'Day','PercentChange']
+
+
 '''
 characteristics[" 8"] = ['High', 'Low']
 characteristics[" 9"] = ['High', 'Low', 'EPS', 'Day']
