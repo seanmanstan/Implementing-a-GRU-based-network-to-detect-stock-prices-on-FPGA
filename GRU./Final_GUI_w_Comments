@@ -1,0 +1,777 @@
+#800000  Hex for maroon
+import math
+from tkinter import *
+import os
+import numpy as np
+import threading
+from time import sleep
+#import csv
+from PIL import ImageTk, Image
+#from GUI_Functs import makeDataYearPlot, packPlotImage
+import matplotlib.pyplot as plt
+plt.switch_backend('Agg')
+
+plt.style.use('fivethirtyeight')
+import pandas as pd
+from tkinter import messagebox
+import datetime as dt
+
+from Data_Scraper import *
+#from backend import *
+
+## change this to backend for the known working version
+
+from PrepdictionDataPrep import *
+
+
+#*****************************************************************************************************************
+#*****************************************************************************************************************
+#*****************************************************************************************************************
+
+#Definitions section
+#these are some strings and other variable initilizations that will be mutated for the frames at the global scope
+VolumeDef ="Volume: The volume of trade refers to the total number of shares or contracts exchanged between buyers and sellers of a security during trading hours on a given day. The volume of trade is a measure of the market\'s activity \nand liquidity during a set period of time. Higher trading volumes are considered more positive than lower trading volumes because they mean more liquidity and better order execution."
+InsiderTradeDef = "Insider Trading: The trading of a public company's stock or other securities from employees within the company based on material, that is nonpublic information about the company.\n" \
+                  "Our data shows legally reported insider trades through the SEC."
+EPSDef = "Earnings per share (EPS): is a company's net profit divided by the number of common shares it has outstanding. EPS indicates how much money a company makes for each share of its stock and is a widely \nused metric for estimating corporate value."
+
+stockName = ""
+working_Frame = 0
+optionsWindowOpen = 0
+top = 0
+loadText = "Collecting your stock data"
+loadText1 = "Collecting your stock data."
+loadText2 = "Collecting your stock data.."
+loadText3 = "Collecting your stock data..."
+loadTextDone = "Complete"
+RecentinsiderTrade = ""
+
+Price1, Price2 = 0, 0
+dodPercIncr = ""
+
+EPS1, EPS2 = 0, 0
+EPSStatement = ""
+
+permanentStartDate = '2000-01-01'
+permanentStartDate = dt.datetime.strptime(permanentStartDate, '%Y-%m-%d') #make start date a "datetime" object in order to work with it
+predictedValuesList = []
+
+ExceptionsList = [None]*1
+
+#*****************************************************************************************************************
+#*****************************************************************************************************************
+#*****************************************************************************************************************
+
+
+#Create the object GUI using tkinter
+class GUI(Tk):
+
+    def __init__(self):
+        super().__init__() #define the initialize of the object as itself
+
+        self.title("GBSPS Window")  #Window title seen at top left of screen
+
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)  #protocol to end window task when it is closed
+
+        #root.configure(background="darkgrey")
+        self.geometry("900x525")                   #set what aspect ratio is being used
+        self.resizable(width=False, height=False)  #disable the screen resizing feature
+
+        self.background_image = ImageTk.PhotoImage(Image.open("stolen_stockImage.jpg"))  #load the background image being used
+        self.background_label = Label(self, image=self.background_image)                #place the image in a label frame
+        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
+
+        #Add the title greeting bar that will always be updated per page accessed
+        self.greeting_Frame = Label(master = self,text="Howdy Trader!\nEnter A Stock Ticker", font=('calibre',14,'bold'), fg="white", bg = "#800000")
+
+        self.greeting_Frame.pack(fill=BOTH)
+
+        #initialize the stock ticker var that will be input into the system
+        self.ticker = StringVar()
+
+        #Add a frame to hold the entry box and submit button
+        self.StockentryFrame = Label(master = self, bg="darkgrey")
+        self.StockentryFrame.pack() #pack the frame, will place the entry frame in the window below the greeting
+
+        #add an entry box for the stock ticker to be entered into
+        self.name_entry = Entry(master = self.StockentryFrame, textvariable = self.ticker, font=('calibre',12,'normal')).grid(row=0,column=1, sticky= "NS")
+
+        #Add submit button for the entry box
+        self.sub_btn = Button(self.StockentryFrame, text='Submit', command=self.submit).grid(row=1,column=1, sticky= "NS")
+
+
+
+    def MakePredictionPlot(self):
+        global predictedValuesList, top, stockName  #denote that the global scope of these vars must be used
+
+        if(not (os.path.exists("saved_GRU_"+stockName+"_Model.h5"))):  ## check the local directory for an existent trained model for the ticker
+            print("No trained model exists in the directory")
+            self.RunTheGRU()  #call the function that will handle if the user wants to train a model or not
+            return
+
+        #if a model did exist then call the saved model using the stock name to get a prediction made
+        predictedValuesList = []
+        predictedValuesList = MakePrediction(stockName)
+
+        #A section of code here has been removed and place in the unused section of the code at the bottom
+        #*************************
+        #*************************
+        #continue
+
+        #display the prediction back to the user in a popup window
+        top = Toplevel(root)
+        top.geometry("300x100")  #size the window
+        top.title("Price Prediction")  #name the window
+        #in the popup grab the final prediction point from the list
+        Label(top, text="The prediction for "+stockName+ " is $"+str(round(predictedValuesList[-1][0],2)), font=('Arial 12')).place(x=10, y=10)
+
+
+##This function is to close the GUI in order to move to the GRU training script, this must be done to ensure thread handing and processing power is reduced
+    def KillTheGUI(self):
+        global BranchtoGRU #use global indicator that the GUI branched to another script so that the main can know a return will be made
+        BranchtoGRU = 1
+
+        self.GRUOptionsFrame.grid_slaves(row=1, column=0)[0].destroy() #remove the yes and no options from the user after clicking yes
+        self.GRUOptionsFrame.grid_slaves(row=1, column=1)[0].destroy()
+        self.GRUOptionsFrame.pack_forget()
+        self.GRUOptionsFrame.destroy()
+
+        #countdown to the termination of the GUI, this is not working currently
+        self.greeting_Frame.config(text="The GUI will be terminated in: 3")
+        sleep(1)
+        self.greeting_Frame.config(text="The GUI will be terminated in: 2")
+        sleep(1)
+        self.greeting_Frame.config(text="The GUI will be terminated in: 1")
+        sleep(1)
+        root.destroy()  #destory the GBSPS window and migrate the main loop to GRU training
+
+    #this window build is run when the predictor page detects that no model exists in the directory
+    def RunTheGRU(self):
+        global stockName  #call global scope of the stocks name aka ticker
+        self.greeting_Frame.config(text="Alert: No Trained Model Found")  #update the header greeting frame to inform user
+
+        self.OptionFrame.grid_slaves(row=0, column=0)[0].destroy()  #remove the options frame buttons in order to build new window
+        self.OptionFrame.grid_slaves(row=1, column=0)[0].destroy()
+        self.OptionFrame.grid_slaves(row=0, column=1)[0].destroy()
+        self.OptionFrame.pack_forget()
+        self.OptionFrame.destroy()
+
+        self.GRUOptionsFrame = Label(master=root, bg="darkgrey")  #Add option frame to hold GRU training options buttons
+        self.GRUOptionsFrame.pack()
+
+        #text to inform user of what will happen if they press "yes"
+        self.GRUNotificationFrame = Label(master=self.GRUOptionsFrame, bg='darkgrey', text = "There is no trained model in the directory for "+stockName+".\nIn " +
+        "order to make a prediction a model must be trained. To save device resources the GUI will be closed for model training.\n"+
+        "Once the GUI is closed this action cannot be undone. Training can take up to 8 hours to complete, the GUI will reopen when completed.\n"+
+        "Would you like to proceed with training a model?"
+        , font=('calibre',12,'normal')).grid(row=0,column=0,columnspan=2)
+
+        #Add in the buttons of yes or no
+        self.NoGRU_btn = Button(master = self.GRUOptionsFrame, text = 'No', font=('calibre',12,'normal'), width = 15, command=self.BacktoOptsFromRunTheGRU).grid(row=1,column=1, sticky= "NS")
+        self.YesGRU_btn = Button(master = self.GRUOptionsFrame, text='Yes',font=('calibre',12,'normal'), width = 15, command=self.KillTheGUI).grid(row=1,column=0, sticky= "NS")
+
+    #if the user clicks "No" that they do not want to train a model then the options will be remvoed and return to the main options page
+    def BacktoOptsFromRunTheGRU(self):
+        #remove all the options and frames related to the GRU training page
+        self.GRUOptionsFrame.grid_slaves(row=1, column=0)[0].destroy() #remove the yes button
+        self.GRUOptionsFrame.grid_slaves(row=1, column=1)[0].destroy() #remove the no button
+        self.GRUOptionsFrame.pack_forget()
+        self.GRUOptionsFrame.destroy()
+        self.build_optionsMenu()  #rebuild the main options page
+
+
+    #
+    def returnToOpts(self):
+        global optionsWindowOpen, top
+        self.OptionFrame.grid_slaves(row=0, column=0)[0].destroy() #destory the header
+        self.OptionFrame.grid_slaves(row=2, column=0)[0].destroy() #destory year button
+        self.OptionFrame.grid_slaves(row=2, column=1)[0].destroy() #destroy week button
+
+        self.OptionFrame.grid_slaves(row=0, column=2)[0].destroy() #destroy the insidertrading frame
+        self.OptionFrame.grid_slaves(row=1, column=2)[0].destroy() #destroy the EPS frame
+        #self.OptionFrame.grid_slaves(row=2, column=2)[0].destroy() #destroy the DOD frame
+
+        self.OptionFrame.config(image="") #reload the background image, this is needed because the image was overlayed with the frames and plot image
+        self.OptionFrame.pack_forget()
+        self.labelimage.pack_forget()
+        #if the help window was open when retruning to the options then close it
+        if optionsWindowOpen:
+            optionsWindowOpen = 0
+            top.destroy()
+        #Tk.update(root)
+        self.build_optionsMenu()
+
+
+    #this function will bring up a pop up window when the help button is pressed, it will present the user with definitiions
+    def HelpExplainData(self):
+        #use the gloabl scope of the following vars
+        global VolumeDef, InsiderTradeDef, optionsWindowOpen, top
+        #if the help window is already open then do not do anything and leave the call
+        if(optionsWindowOpen):
+            return
+        optionsWindowOpen = 1 #set tracker for help window status
+        top = Toplevel(root)  #create a popup window
+        top.geometry("750x400") #set the aspect ratio, leave the resize default so they user may rescale the window
+        top.title("Help Window")  #label the popup
+
+        #add in the definitions to the popup help window
+        Label(top, text= VolumeDef, font=('Arial 12'), anchor="w", pady = 10).grid(row=0,column=0, sticky= "NW") #.place(x=10, y=10)
+        Label(top, text= InsiderTradeDef, font=('Arial 12'), anchor="w", pady = 10).grid(row=2,column=0, sticky= "NW") #.place(x=10, y=110)
+        Label(top, text= EPSDef, font=('Arial 12'), anchor="w", pady = 10).grid(row=4,column=0, sticky= "NW") #.place(x=10, y=210)
+
+
+    #this function is where the image of the plot and the calculated data are added into the stock information page
+    def packPlotImage(self, recalled):
+        #if the funct is being recalled it must just swap out the plot image being used, if it is zero that means it must also get the calculated data
+        if(recalled == 0):
+            self.greeting_Frame.config(text="Stock Data for ticker: "+stockName)
+            self.OptionFrame.grid_slaves(row=0, column=0)[0].destroy()  #destory the view data button from the main options page
+            self.OptionFrame.grid_slaves(row=0, column=1)[0].destroy()  #destory the make prediction buttom from the main options page
+            self.OptionFrame.grid_slaves(row=1, column=0)[0].destroy()  #destroy the return home button from the main options page
+            self.GrabOtherData()
+        else:
+            self.OptionFrame.grid_slaves(row=0, column=0)[0].destroy()  #destory the plot
+            self.OptionFrame.grid_slaves(row=2, column=0)[0].destroy()  #destroy year button
+            self.OptionFrame.grid_slaves(row=2, column=1)[0].destroy()  #destory week button
+
+            self.OptionFrame.grid_slaves(row=0, column=2)[0].destroy()  #destory insider data
+            self.OptionFrame.grid_slaves(row=1, column=2)[0].destroy()  #destroy eps data
+            self.labelimage.pack_forget()
+
+        percentage = 0.8  #scale factor for the plot image
+        self.image = Image.open(stockName+".png")  #open up the plotted image
+        width, height = self.image.size  #resize the scale factor
+        resized_dimensions = (int(width * percentage), int(height * percentage))
+        resized = self.image.resize(resized_dimensions)
+        #resize_image = image.resize((480, 375))
+        photo = ImageTk.PhotoImage(resized)  #make the photo var the resized version
+
+        #add buttons to allow for switching between yearly and weekly plot
+        self.PlotYear_btn = Button(self.OptionFrame, text='Year', command=lambda: self.makeDataYearPlot(1), height = 1, width = 15).grid(row=2,column=0, sticky= "NSE",columnspan=1)
+        self.PlotWeek_btn = Button(self.OptionFrame, text='Week', command=lambda: self.makeDataWeekPlot(1), height = 1, width = 15).grid(row=2,column=1, sticky= "NSW",columnspan=1)
+
+        #insert the help and return button to the frame
+        self.returnToOptions = Button(self.OptionFrame, text='Return to Options', command=self.returnToOpts, width = 15).grid(row=3,column=2, sticky= "NSE")
+        self.HelpExplain = Button(self.OptionFrame, text='Help/Definitions', command=self.HelpExplainData, width = 15).grid(row=3,column=3, sticky= "NSW")
+
+        #insert the calculated data into the frame
+        self.insiderData = Label(self.OptionFrame, text=RecentinsiderTrade,fg= 'white', bg ='#800000', font='Calibri 12', wraplength=300).grid(row=0,column=2, sticky= "NWE",pady=2, columnspan=2)
+        self.EPSDataLabel = Label(self.OptionFrame, text=EPSStatement + "\n\n"+ dodPercIncr, bg ='#800000', fg= 'white', font='Calibri 12', wraplength=300).grid(row=1,column=2, sticky= "NWE", columnspan=2)
+
+        #self.DODDataLabel = Label(self.OptionFrame, text=dodPercIncr, bg ='#800000', fg= 'white', font='Calibri 12', wraplength=300).grid(row=2,column=2, sticky= "NWE", columnspan=2)
+
+        #add in the scaled plot into the frame and allow it to span 2 rows and columns in the frames grid
+        self.labelimage = Label(master=self.OptionFrame, image = photo)
+        self.labelimage.image = photo
+        self.labelimage.grid(row=0, column=0, columnspan=2, rowspan=2, pady=2, padx=2)
+        #Label(top, text= "Hello World!", font=('Mistral 18 bold')).place(x=150,y=80)
+
+
+    #This function will pull specific information out the data to be displayed in the analysis page
+    def GrabOtherData(self):
+        #use the global scope of the following vars
+        global stockName, RecentinsiderTrade, EPSStatement, dodPercIncr
+
+        file_name_used = stockName + '.csv'
+        dataset = pd.read_csv(file_name_used, index_col='Date', parse_dates=['Date'])  #open the data csv
+        dataset = dataset['2021':'2022']  #read data from the past two years
+        dataset.index = pd.to_datetime(dataset.index)
+        TemplengthOfdata = len(dataset['Traded'])  #store the length of the new list for looping
+
+        for x in range(TemplengthOfdata):
+            temp = dataset['Traded'][TemplengthOfdata-x-1]  #grab the volume traded value for insider trading column
+            if((temp != 0) and (not(pd.isna(temp)))):  #if this is a value and not a NaN then use it for display
+                if(temp < 0):  #if it was a sale the value is negative so display as a sale
+                    RecentinsiderTrade = "The most recent insider trade was a sale of:\n" + str(temp) + " shares on " + str(dataset.index[TemplengthOfdata-x-1])[:10]
+                else:  #if it was a buy  the value is positive  so display as a buy
+                    RecentinsiderTrade = "The most recent insider trade was a buy of:\n" + str(temp)+ " shares on " + str(dataset.index[TemplengthOfdata-x-1])[:10]
+                break
+            #if there were no recent insider trades in the past two years display this
+            RecentinsiderTrade = "No Recent Insider Trades"
+
+        #next get the length of the EPS column for looping
+        TemplengthOfdata = len(dataset['EPS'])
+        Temp2InstancesFound = 0 #use this var a flag that two data points were found
+        EPS1, EPS2 = 0, 0  #use two eps data points as the percentage of change between the last two reports is going to be displayed
+        for x in range(TemplengthOfdata):
+            temp = dataset['EPS'][TemplengthOfdata-x-1]
+            if(not(pd.isna(temp))):  #if the data point is a value test more
+                if(Temp2InstancesFound == 0):  #on first value occurence save that as the recent EPS, called EPS1
+                    EPS1 = dataset['EPS'][TemplengthOfdata-x-1]
+                    Temp2InstancesFound +=1
+                elif((Temp2InstancesFound == 1) and (dataset['EPS'][TemplengthOfdata-x-1]!=EPS1) ):  #on the second value occurnece of a different value enter here
+                    EPS2 = dataset['EPS'][TemplengthOfdata-x-1]  #save the second value of EPS
+                    break
+                else:
+                    continue
+        temp = round(((EPS1 - EPS2) / EPS1),2)  #calculate the percentage of change
+        #next display the information based on whether there was an increase or decrease in EPS data over the past two quarters
+        if(temp>0):
+            EPSStatement = "There was an increase of " + str(temp)+"% \nin the past two EPS reports."
+        else:
+            EPSStatement = "There was an decrease of " + str(temp)+"% \nin the past two EPS reports."
+
+        #lastly we will display the day over day percent change of the closing price from the data
+        TemplengthOfdata = len(dataset['Close'])
+        Price1, Price2 = 0, 0  #need past two days of data to do this calculation
+
+        Price1 = dataset['Close'][TemplengthOfdata-1]  #get most recent day, the last item of list
+        Price2 = dataset['Close'][TemplengthOfdata-2]  #get day before the end
+        temp = round(((Price1 - Price2)/Price2)*100, 2)  #calculate the percent change
+
+        #display the change in accordance to whether it was an increase or decrease
+        if(temp>0):
+            dodPercIncr = "There was a DOD increase of " + str(temp)+"% \nin the past two trading days."
+        else:
+            dodPercIncr = "There was a DOD decrease of " + str(temp)+"% \nin the past two trading days."
+
+
+    #this function is the create the weekly data plot in the data viewing page
+    def makeDataWeekPlot(self,PlotRecall):
+        global stockName
+
+        file_name_used = stockName + '.csv'
+        #print(file_name_used + ": this file was called")
+
+        dataset = pd.read_csv(file_name_used, index_col='Date', parse_dates=['Date'])  #read the ticker data csv
+        dataset = dataset['2022':'2022']  #use the past year as the data to view
+        dataset = dataset.tail(5)  # for the weekly image we are just going to use the past 5 days
+
+        dataset['Day'] = dataset.index.dayofyear
+        dataset['DateUse'] = pd.to_datetime(dataset['Day'], format='%j').dt.strftime('%m-%d')
+
+        figure, (ax1, ax2) = plt.subplots(2, 1)  #setup a plot that has two tables within it
+        ax1.plot(dataset['Day'], dataset['Close'], linewidth=2.0)  #specify the data for the first plot as a line graph
+        ax1.set_title(stockName + " Stock Values")  #make the title the ticker
+        ax1.set_ylabel('Value at Close USD:$')  #label the y axis
+        ax2.bar(dataset['Day'], dataset['Volume'])  #specify the data for the second plot and use a bar graph for the volume data
+        ax2.set_xlabel('Day of year') #label the second x axis
+        ax2.set_ylabel('Volume Traded') #label the y axis of the volume
+
+        #ax1.xticks(np.arange(0, len(x)+1, 5))
+        dif_ofMaxMin = dataset['Close'].max() - dataset['Close'].min()
+
+        #the following are scaling methods used to display dating on the y axis of the plot in increments that wont be overlapping
+        if(dif_ofMaxMin < 2):
+            ax1.yaxis.set_ticks(np.arange(math.floor(dataset['Close'].min()), math.ceil(dataset['Close'].max()), 0.25))
+        if((dif_ofMaxMin >= 2) and (dif_ofMaxMin < 3)):
+            ax1.yaxis.set_ticks(np.arange(math.floor(dataset['Close'].min()), math.ceil(dataset['Close'].max()), 0.35))
+        elif((dif_ofMaxMin >= 3) and (dif_ofMaxMin < 5)):
+            ax1.yaxis.set_ticks(np.arange(math.floor(dataset['Close'].min()), math.ceil(dataset['Close'].max()), 0.50))
+        elif((dif_ofMaxMin >= 5) and (dif_ofMaxMin < 7)):
+            ax1.yaxis.set_ticks(np.arange(math.floor(dataset['Close'].min()), math.ceil(dataset['Close'].max()), 1))
+        elif((dif_ofMaxMin >= 7) and (dif_ofMaxMin < 10)):
+            ax1.yaxis.set_ticks(np.arange(math.floor(dataset['Close'].min()), math.ceil(dataset['Close'].max()), 1.55))
+        elif((dif_ofMaxMin >= 10) and (dif_ofMaxMin < 15)):
+            ax1.yaxis.set_ticks(np.arange(math.floor(dataset['Close'].min()), math.ceil(dataset['Close'].max()), 2.5))
+        elif((dif_ofMaxMin >= 15) and (dif_ofMaxMin < 20)):
+            ax1.yaxis.set_ticks(np.arange(math.floor(dataset['Close'].min()), math.ceil(dataset['Close'].max()), 5))
+        else:
+            None
+
+        #save plot that was made as a png in the directory with its ticker as the name
+        plt.tight_layout(h_pad=2)
+        plt.savefig(stockName + '.png') #, bbox_inches="tight"
+        plt.cla() #clear the axis
+        plt.close() #close the plotting tool out of the RAM/cache
+        #plot recall is used to track if images need to be removed from the frame before adding the next one
+        if(PlotRecall):
+            self.packPlotImage(1)
+
+
+
+    def makeDataYearPlot(self, PlotRecall):
+        global stockName
+        file_name_used = stockName + '.csv'
+        #print(file_name_used + ": this file was called")
+
+        dataset = pd.read_csv(file_name_used, index_col='Date', parse_dates=['Date'])  #parse the data csv by the date column
+        dataset = dataset['2022':'2022']  #get the data from the past year
+
+        dataset['Day'] = dataset.index.dayofyear
+        dataset['DateUse'] = pd.to_datetime(dataset['Day'], format='%j').dt.strftime('%m-%d')
+
+        figure, (ax1, ax2) = plt.subplots(2, 1)  #setup a plot that has two tables within it
+        ax1.plot(dataset['Day'], dataset['Close'], linewidth=2.0) #plot the close values vs days as a line plot in the first subplot
+        ax1.set_title(stockName + " Stock Values")  #title the first subplot
+        ax1.set_ylabel('Value at Close USD:$')  #label the y axis of the first subplot
+
+        ax2.bar(dataset['Day'], dataset['Volume']) #plot the volume as a bar graph for the second subplot
+        ax2.set_xlabel('Day of year') #label the x axis of the plots
+        ax2.set_ylabel('Volume Traded') #label the y axis of the volume subplot
+
+        plt.tight_layout(h_pad=2)
+        plt.savefig(stockName + '.png') # save the year plot under the stock ticker
+        plt.cla()  #clear out the axis formatting
+        plt.close()  #clear the plot out of the cache/RAM
+        #plot recall is used to track if images need to be removed from the frame before adding the next one
+        if(PlotRecall):
+            self.packPlotImage(1)
+        else:
+            self.packPlotImage(0)
+
+
+    #this functions handles if the user clicks the button to return home from the main options page
+    def rebuildHome(self):
+        #change the header back to the stock entry title
+        self.greeting_Frame.config(text="Enter A Stock Ticker")
+        self.OptionFrame.grid_slaves(row=0, column=0)[0].destroy() #destory the view data button
+        self.OptionFrame.grid_slaves(row=1, column=0)[0].destroy() #destory the make prediction button
+        self.OptionFrame.grid_slaves(row=0, column=1)[0].destroy() #destory the retrun home button
+        self.OptionFrame.pack_forget()
+        self.StockentryFrame = Label(master=root, bg="darkgrey") # add back the stock entry frame to hold the entry box and submit button
+        self.StockentryFrame.pack()
+        #add in the text entry box
+        self.name_entry = Entry(master = self.StockentryFrame, textvariable = ticker, font=('calibre',12,'normal')).grid(row=0,column=1, sticky= "NS")
+        #add in the submit button
+        self.sub_btn = Button(self.StockentryFrame, text='Submit', command=self.submit).grid(row=1,column=1, sticky= "NS")
+
+
+    def build_optionsMenu(self):
+        #global OptionFrame
+        #build the main options page that the user may select to return to the entry page or predict, or analyze
+        self.greeting_Frame.config(text="Would you like to view the stock information or train a prediction model?")
+        self.OptionFrame = Label(master = root, fg="white", bg = "#800000")
+        self.OptionFrame.pack()
+        #build the button for viewing the stock data
+        self.view_stockInfo_btn = Button(self.OptionFrame ,font='Bold', text='View Information', command=lambda: self.makeDataYearPlot(0),height = 2, width = 15).grid(row=0,column=0, sticky= "NS")
+        #build the button for model predictions or training
+        self.train_model_btn = Button(self.OptionFrame, font='Bold' , text ='Make Prediction', command=self.MakePredictionPlot, height = 2, width = 15).grid(row=0,column=1, sticky= "NS")
+        #build the button for returning back to the stock entry page aka the home page
+        self.ReturnHome_btn = Button(self.OptionFrame, text='Return Home', command=self.rebuildHome).grid(row=1,column=0, sticky= "NSWE", columnspan=2, pady=2)
+        return
+
+
+    ###**********************************************************************************************************************************************
+    ###**********************************************************************************************************************************************
+    def loadingData(self):
+        #Use the global scrope of the following vars
+        global loadText1, loadText3, loadText2, loadText, loadTextDone
+        global permanentStartDate
+        global stockName, ExceptionsList
+
+        Scraper_was_called=0  #track if the scraper has been called
+
+        #sleep(0.5)
+        self.working_Frame.config(text = loadText1)
+        sleep(0.5)
+        self.working_Frame.config(text = loadText2)
+        sleep(0.5)
+        self.working_Frame.config(text = loadText3)
+        sleep(0.5)
+        self.working_Frame.config(text = loadText)
+
+        try: #attempt at large to get data, there is more specific tries within here for specific fail cases.
+            if(os.path.exists(stockName+".csv")): #test if there is already a csv in the directory
+                #if there was a existent file then try to open and read what it has
+                try:
+                    dataset = pd.read_csv(stockName + ".csv", index_col='Date', parse_dates=['Date'])
+                except:
+                    print("Failed to open the csv inside the callFile function")
+                    return
+                #dataset = pd.read_csv(stockName + ".csv", index_col='Date', parse_dates=['Date'])
+                #get information about what todays date is and what the last recorded date in the data csv is
+                todaysDate = str(dt.datetime.now())[0:10]
+                dataset = dataset[todaysDate[0:4] : todaysDate[0:4]]
+                finalDatasetDate = str(dataset.index[-1])[0:10]
+                endDate = dt.datetime.now() #set end date to today ("datetime" object)
+
+                print("The data end dates were the same:",(todaysDate == finalDatasetDate))  #print out to the IDE if the dates were the same or not
+
+                if(todaysDate != finalDatasetDate):  #if the dates were not the same move to update the script
+                    try:
+                        self.working_Frame.config(text = "Updating Data")  #inform the user the data is now being updated
+                        sleep(0.1)
+                        Scraper_was_called = 1 #record that the scraper is going to called in a thread
+                        threading.Thread(target=lambda:Data_Scraper(stockName, permanentStartDate, endDate, ExceptionsList)).start()
+                    except:
+                        print("Calling the datascraper script from the loadingData funct failed")
+                else:
+                    None ## date was the same so dont call scraper script.
+                #sleep(3)
+
+                while(1):  #enter a loop to display the data being updated until it is done
+                    self.working_Frame.config(text = "Updating Data.")
+                    sleep(0.75)
+                    self.working_Frame.config(text = "Updating Data..")
+                    sleep(0.75)
+                    self.working_Frame.config(text = "Updating Data...")
+                    sleep(0.75)
+
+                    #open the csv and parse the dates
+                    dataset = pd.read_csv(stockName + ".csv", index_col='Date', parse_dates=['Date'])
+                    attributes = dataset.columns.tolist()
+                    finalDatasetDate = str(dataset.index[-1])[0:10] #get the last date in the csv
+
+                    #check is the slower attributes have been loaded in yet
+                    if(("EPS" in attributes) and ("Traded" in attributes)):
+                        #check if the date from the csv is todays date and if so then the update is done
+                        if(todaysDate == finalDatasetDate):
+                            break
+                        #check if the update was being done on the weekend, if so break cause stock data is not updated over the weekend
+                        if( (dt.datetime.today().weekday() == 6) or (dt.datetime.today().weekday() == 5)):
+                            break
+                        #if((dt.datetime.today().weekday() == 0)):
+                        #check if the update is occuring overnight, break becasue stocks are not updated past 5pm EST
+                        if(datetime.now().time().hour < 9):
+                            print("Updating overnight so dates will be different")
+                            break
+                    #verify that the scraper was called in a thread and test for missing attributes
+                    if(("EPS" not in attributes) and ("Traded" not in attributes) and (not Scraper_was_called) and (todaysDate == finalDatasetDate)):
+                        print("data was missing, calling scraper")
+                        try:
+                            threading.Thread(target=lambda:Data_Scraper(stockName, permanentStartDate, endDate, ExceptionsList)).start()
+                            Scraper_was_called = 1
+                        #if the thread is failing then inform the user and return home to the landing page
+                        except Exception as e:
+                            self.working_Frame.config(text = "Something Went Wrong :( \nReturning Home")  #display in the frame that something failed
+                            print(e)  #print out the error to the IDE
+                            print("Calling the datascraper script from the loadingData funct failed within the no existing csv conditional")
+                            sleep(3) #delay so the user has time to read the failure message
+                            self.working_Frame.pack_forget() #destory the updating data frame that is visual to the user
+                            self.working_Frame.destroy()
+                            self.greeting_Frame.config(text="Enter A Stock Ticker")  #alter the header back to the home page title
+                            self.StockentryFrame = Label(master = root, bg="darkgrey")
+                            self.StockentryFrame.pack()
+                            #add back the stock entry box and the submit button
+                            self.name_entry = Entry(master = self.StockentryFrame, textvariable = self.ticker, font=('calibre',12,'normal')).grid(row=0,column=1, sticky= "NS")
+                            self.sub_btn = Button(self.StockentryFrame, text='Submit', command=self.submit).grid(row=1,column=1, sticky= "NS")
+                            return
+                    #test the global scope execptions list for any failure being documented from the scraper
+                    # if there is a fail then inform the user and return back home to the stock entry page
+                    if "ScraperFail" in ExceptionsList:
+                        self.working_Frame.config(text = "Something Went Wrong :( \nReturning Home")
+                        print("The datascraper script failed")
+                        sleep(3)  #delay so the user has time to read the failure message
+                        self.working_Frame.pack_forget()  #destory the updating data frame that is visual to the user
+                        self.working_Frame.destroy()
+                        self.greeting_Frame.config(text="Enter A Stock Ticker")
+                        self.StockentryFrame = Label(master = root, bg="darkgrey")
+                        self.StockentryFrame.pack()
+                        #add back the stock entry box and the submit button
+                        self.name_entry = Entry(master = self.StockentryFrame, textvariable = self.ticker, font=('calibre',12,'normal')).grid(row=0,column=1, sticky= "NS")
+                        self.sub_btn = Button(self.StockentryFrame, text='Submit', command=self.submit).grid(row=1,column=1, sticky= "NS")
+                        return
+
+                # if everything passed and the loop was ended then display to the user that the data updating has been completed, then destory the loading visual
+                self.working_Frame.config(text = loadTextDone)
+                self.working_Frame.pack_forget()
+                self.working_Frame.destroy()
+                #StockentryFrame.grid_slaves(row=2, column=0)[0].destroy()
+                self.build_optionsMenu()  #call funct to build the main options window after data is updated
+                #break
+            else:
+                try:
+                    endDate = dt.datetime.now() #set end date to today ("datetime" object)
+                    threading.Thread(target=lambda:Data_Scraper(stockName, permanentStartDate, endDate, ExceptionsList)).start()
+                except Exception as e:
+                    self.working_Frame.config(text = "Something Went Wrong :( \nReturning Home")
+                    print(e)
+                    print("Calling the datascraper script from the loadingData funct failed within the no existing csv conditional")
+                    sleep(3)
+                    self.working_Frame.pack_forget()
+                    self.working_Frame.destroy()
+                    #global StockentryFrame
+                    #global OptionFrame
+                    self.greeting_Frame.config(text="Enter A Stock Ticker")
+                    self.StockentryFrame = Label(master = root, bg="darkgrey")
+                    self.StockentryFrame.pack()
+                    self.name_entry = Entry(master = self.StockentryFrame, textvariable = self.ticker, font=('calibre',12,'normal')).grid(row=0,column=1, sticky= "NS")
+                    self.sub_btn = Button(self.StockentryFrame, text='Submit', command=self.submit).grid(row=1,column=1, sticky= "NS")
+                    return
+
+                while(1):
+                    sleep(1)
+                    self.working_Frame.config(text = loadText1)
+                    sleep(1)
+                    self.working_Frame.config(text = loadText2)
+                    sleep(1)
+                    self.working_Frame.config(text = loadText3)
+                    sleep(1)
+                    self.working_Frame.config(text = loadText)
+
+                    if("ScraperFail" in ExceptionsList):
+                        self.working_Frame.config(text = "Something Went Wrong :( \nReturning Home")
+                        print("The datascraper script crashed")
+                        sleep(3)
+                        self.working_Frame.pack_forget()
+                        self.working_Frame.destroy()
+                        #global StockentryFrame
+                        #global OptionFrame
+                        self.greeting_Frame.config(text="Enter A Stock Ticker")
+                        self.StockentryFrame = Label(master = root, bg="darkgrey")
+                        self.StockentryFrame.pack()
+                        self.name_entry = Entry(master = self.StockentryFrame, textvariable = self.ticker, font=('calibre',12,'normal')).grid(row=0,column=1, sticky= "NS")
+                        self.sub_btn = Button(self.StockentryFrame, text='Submit', command=self.submit).grid(row=1,column=1, sticky= "NS")
+                        return
+
+                    if(os.path.exists(stockName+".csv")):
+                        dataset = pd.read_csv(stockName + ".csv", index_col='Date', parse_dates=['Date'])
+                        attributes = dataset.columns.tolist()
+                        if(("EPS" in attributes) and ("Traded" in attributes)):
+                            sleep(4)
+                            self.working_Frame.config(text = loadTextDone)
+                            sleep(1)
+                            self.working_Frame.pack_forget()
+                            self.working_Frame.destroy()
+                            #StockentryFrame.grid_slaves(row=2, column=0)[0].destroy()
+                            self.build_optionsMenu()
+                            break
+                        else:
+                            continue
+
+        except Exception as e:
+            print("OS file exist failed within the loadingData funct")
+            print(e)
+                #print("Failed to open the csv inside the callFile function")
+                #return
+    ###**********************************************************************************************************************************************
+    ###**********************************************************************************************************************************************
+
+
+    def submit(self):
+        global stockName, ticker  #use the global scope of these vars
+        ticker = self.ticker  #set the ticker to its own value within local object
+        stockName = self.ticker.get()  #get the ticker out of the stock entry box
+
+        if ticker.get() == '':  ## if the stock entry box was empty then alert the user to enter a ticker
+            messagebox.showerror('Error message box',
+                                 'Please enter a stock ticker in the blank field', parent=root)
+            self.StockentryFrame.focus_force()
+            return
+        stockName = stockName.upper()  #if there was a ticker in the box, use all caps for Yahoo to recognize it
+        print("The stock is : " + stockName)
+        ticker.set("")
+
+        # go try this ticker on the web to verify it is a valid stock. if it is not real or found alert the user of this. Then return to the entry box
+        try:
+            pdr.DataReader(stockName, 'yahoo', '2021-01-01', '2022-01-01') #try to pull stock data from yahoo finance
+        except:
+            messagebox.showerror('Error message box',
+                                 'The ticker you entered was not valid or real.\nPlease enter a valid stock ticker in the blank field', parent=root)
+            self.StockentryFrame.focus_force()
+            return
+
+        # if the stock was valid then move on to destory the entry box and landing page
+        #del currentData
+        self.StockentryFrame.grid_slaves(row=0, column=1)[0].destroy() #remove entry box
+        self.StockentryFrame.grid_slaves(row=1, column=1)[0].destroy() #remove submit button
+        self.StockentryFrame.forget()
+        self.StockentryFrame.destroy()
+
+        #global working_Frame
+        self.working_Frame = Label(master=root,text=loadText, font=('calibre',14,'normal'), fg="White", bg = "darkgrey")
+        #working_Frame.grid(row=0,column=0,sticky=W)
+        self.working_Frame.pack()
+
+        #threading.Thread(target=callFile).start()
+        threading.Thread(target=self.loadingData).start()  #call the data load script that will use the scraper to get data
+
+    #this function is to display a confirmation that the user wants to close the software
+    def on_closing(self):
+        global setWindowClosed  #use global indicator for main branch to know the software is set to close
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            root.destroy()
+            setWindowClosed = 1
+
+
+
+#*******************************************************************************************************************************
+#*******************************************************************************************************************************
+#*******************************************************************************************************************************
+#*******************************************************************************************************************************
+#*******************************************************************************************************************************
+#*******************************************************************************************************************************
+#The following section is where the main loop of the code will be handled
+
+
+setWindowClosed = 0
+BranchtoGRU = 0
+
+
+# Here is our main branch that will handle the booting of the GUI and threading out to the GRU training script
+if __name__=="__main__":
+
+    while(1):
+        if not setWindowClosed:
+            root = GUI()
+            root.mainloop()
+            print("We are now back inside of the main line")
+            if BranchtoGRU:
+                del root
+                print("Entering GRU call")
+                os.system('python GRU.py ' + stockName)
+                sleep(1)
+                BranchtoGRU = 0
+        else:
+            break
+
+
+
+
+#*******************************************************************************************************************************
+#*******************************************************************************************************************************
+#*******************************************************************************************************************************
+#*******************************************************************************************************************************
+#*******************************************************************************************************************************
+#*******************************************************************************************************************************
+# The following section is for code that went unused in the final GUI version
+
+
+
+        #this section is unused but was going to be to display the prediction at the end of a weekly plot
+        # it should exist within the MakePredictionPlot function
+        '''
+        
+        file_name_used = stockName + '.csv'
+
+        dataset = pd.read_csv(file_name_used, index_col='Date', parse_dates=['Date'])
+        dataset = dataset['2022':'2022']
+        dataset = dataset.tail(5)
+
+        dataset['Day'] = dataset.index.dayofyear
+        dataset['DateUse'] = pd.to_datetime(dataset['Day'], format='%j').dt.strftime('%m-%d')
+
+        figure, (ax1, ax2) = plt.subplots(2, 1)
+        #figure.autolayout :True
+
+        days = dataset['Day'].tolist()
+
+        for i in range(0, len(days)):
+            days[i] = int(days[i])
+        days.append(days[-1]+1)
+        #print(days)
+
+        #ax1.plot(dataset['Day'], dataset['Close'], linewidth=2.0)
+        ax1.plot(days[:5], dataset['Close'], linewidth=2.0)
+
+        ax1.plot(days[1:6], predictedValuesList[-5:], linewidth=2.0)
+
+        ax1.set_title(stockName + " Stock Values")
+        #ax1.set_xlabel('Day of year')
+        ax1.set_ylabel('Value at Close USD:$')
+
+        ax2.bar(dataset['Day'], dataset['Volume'])
+        ax2.set_xlabel('Day of year')
+        ax2.set_ylabel('Volume Traded')
+
+        #ax1.xticks(np.arange(0, len(x)+1, 5))
+        dif_ofMaxMin = dataset['Close'].max() - dataset['Close'].min()
+        if(dif_ofMaxMin < 5):
+            ax1.yaxis.set_ticks(np.arange(math.floor(dataset['Close'].min()), math.ceil(dataset['Close'].max()), 0.5))
+        elif((dif_ofMaxMin > 5) and (dif_ofMaxMin < 7)):
+            ax1.yaxis.set_ticks(np.arange(math.floor(dataset['Close'].min()), math.ceil(dataset['Close'].max()), 1))
+        elif((dif_ofMaxMin > 7) and (dif_ofMaxMin < 10)):
+            ax1.yaxis.set_ticks(np.arange(math.floor(dataset['Close'].min()), math.ceil(dataset['Close'].max()), 1.55))
+        elif((dif_ofMaxMin > 10) and (dif_ofMaxMin < 15)):
+            ax1.yaxis.set_ticks(np.arange(math.floor(dataset['Close'].min()), math.ceil(dataset['Close'].max()), 2.5))
+        elif((dif_ofMaxMin > 15) and (dif_ofMaxMin < 20)):
+            ax1.yaxis.set_ticks(np.arange(math.floor(dataset['Close'].min()), math.ceil(dataset['Close'].max()), 5))
+        else:
+            None
+
+        plt.tight_layout(h_pad=2)
+        plt.savefig(stockName + 'prediction.png') #, bbox_inches="tight"
+        plt.cla()
+        plt.close()
+        '''
