@@ -374,6 +374,7 @@ for x in stockTickerArray: #iterate over every stock ticker in array
 ###########################################################################################################################
 ##################################################Sentiment Analysis#######################################################
     sentimentColumn = []
+    latestSentimentData = 0
     try:
         exclusion_list = ['null', 'null'] # create a blacklist of words
         analyzer = SentimentIntensityAnalyzer()
@@ -450,9 +451,12 @@ for x in stockTickerArray: #iterate over every stock ticker in array
                     if (date_in_file in sent_dict):
                         #latest_month_in_file = date_in_file # not needed?
                         sentimentColumn.append(sent_dict.get(date_in_file))
+                        latestSentimentData = sent_dict.get(date_in_file)
                         #print("Date in file found in dictionary!")
-                    else:
-                        sentimentColumn.append("NaN")
+                    elif (dt.datetime.strptime(date_in_file, '%Y-%m') < dt.datetime.strptime("2010-01", '%Y-%m')): #RHS must be start date 
+                        sentimentColumn.append("NaN")                        
+                    else: #for the month we are currently in
+                        sentimentColumn.append(latestSentimentData)
                 else:
                     pass #do nothing
 
