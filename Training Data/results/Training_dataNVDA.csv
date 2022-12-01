@@ -1,0 +1,23 @@
+Ticker,Attributes,DirErr,RMSE,Training_Time
+NVDA,"['High', 'Low', 'Open', 'EPS', 'Day', 'Close']",46.85,23.157392370314298,
+NVDA,"['High', 'Low', 'Open', 'Day', 'Close']",49.49,18.791160876795306,
+NVDA,"['High', 'Low', 'Day', 'Close']",50.0,19.139534689013896,
+NVDA,"['High', 'Low', 'Open', 'Close']",46.43,19.318797078073086,
+NVDA,"['High', 'Low', 'Close']",46.94,20.797677531648628,
+NVDA,"['High', 'Low', 'EPS', 'Day', 'Close']",47.55,21.61743561810229,
+NVDA,"['High', 'Close']",47.96,18.278471467085996,
+NVDA,"['High', 'Low', 'Open', 'Day', 'IR', 'Close']",49.49,19.00572912627696,
+NVDA,"['High', 'Low', 'EPS', 'Day', 'IR', 'Close']",46.85,22.406776544068745,
+NVDA,"['High', 'Low', 'IR', 'Close']",46.43,15.988668742982721,
+NVDA,"['High', 'Low', 'Day', 'IR', 'Close']",50.0,19.58530399081936,
+NVDA,"['High', 'Low', 'Open', 'EPS', 'Day', 'PercentChange', 'Close']",47.55,20.998890078799764,
+NVDA,"['High', 'Low', 'Open', 'Day', 'PercentChange', 'Close']",52.04,18.901883648146228,
+NVDA,"['High', 'Low', 'Day', 'PercentChange', 'Close']",51.02,16.646784446960865,
+NVDA,"['High', 'Low', 'Open', 'PercentChange', 'Close']",50.51,16.119697649171243,
+NVDA,"['High', 'Low', 'Day', 'IR', 'PercentChange', 'Close']",49.49,19.229305247534693,
+NVDA,"['High', 'Low', 'Open', 'EPS', 'Day', 'IR', 'PercentChange', 'Close']",48.25,22.84435417711038,
+NVDA,"['High', 'Low', 'Open', 'Day', 'IR', 'PercentChange', 'Close']",50.51,26.793564175774964,
+NVDA,"['High', 'Low', 'EPS', 'Day', 'IR', 'PercentChange', 'Close']",48.25,22.080354554135628,
+NVDA,"['High', 'Low', 'IR', 'PercentChange', 'Close']",50.0,15.911867583772029,
+,,,,2022-10-14 17:24:31.255131
+,,,,2022-10-14 20:13:02.004637

@@ -1,0 +1,23 @@
+Ticker,Attributes,DirErr,RMSE,Training_Time
+HPQ,"['High', 'Low', 'Open', 'EPS', 'Day', 'Close']",45.45,1.5932963983983495,
+HPQ,"['High', 'Low', 'Open', 'Day', 'Close']",48.98,1.431780389974102,
+HPQ,"['High', 'Low', 'Day', 'Close']",49.49,1.3401372561710263,
+HPQ,"['High', 'Low', 'Open', 'Close']",48.47,1.5685669598170995,
+HPQ,"['High', 'Low', 'Close']",48.98,1.229162994807255,
+HPQ,"['High', 'Low', 'EPS', 'Day', 'Close']",48.25,1.4528181268391338,
+HPQ,"['High', 'Close']",49.49,2.5133238564661036,
+HPQ,"['High', 'Low', 'Open', 'Day', 'IR', 'Close']",50.51,1.9934507617253756,
+HPQ,"['High', 'Low', 'EPS', 'Day', 'IR', 'Close']",48.95,1.5434331271435608,
+HPQ,"['High', 'Low', 'IR', 'Close']",51.02,1.992786055927051,
+HPQ,"['High', 'Low', 'Day', 'IR', 'Close']",51.02,1.440255284527086,
+HPQ,"['High', 'Low', 'Open', 'EPS', 'Day', 'PercentChange', 'Close']",55.94,1.2237864897796633,
+HPQ,"['High', 'Low', 'Open', 'Day', 'PercentChange', 'Close']",54.08,1.3358031803127295,
+HPQ,"['High', 'Low', 'Day', 'PercentChange', 'Close']",52.04,1.5320290849326128,
+HPQ,"['High', 'Low', 'Open', 'PercentChange', 'Close']",52.04,1.2220691132891437,
+HPQ,"['High', 'Low', 'Day', 'IR', 'PercentChange', 'Close']",52.55,2.3213099435102467,
+HPQ,"['High', 'Low', 'Open', 'EPS', 'Day', 'IR', 'PercentChange', 'Close']",53.85,2.118954955415664,
+HPQ,"['High', 'Low', 'Open', 'Day', 'IR', 'PercentChange', 'Close']",52.04,1.3208395177343573,
+HPQ,"['High', 'Low', 'EPS', 'Day', 'IR', 'PercentChange', 'Close']",53.15,1.2684910686040096,
+HPQ,"['High', 'Low', 'IR', 'PercentChange', 'Close']",54.08,1.445807916786121,
+,,,,2022-10-15 04:48:34.109727
+,,,,2022-10-15 07:34:37.708198
