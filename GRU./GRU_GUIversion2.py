@@ -186,8 +186,8 @@ def GRUModelBuild(arrX, arrY, arrDem, daysback):
     ModelGRU.add(GRU(units=80, return_sequences=True, activation='tanh' ))
     ModelGRU.add(Dropout(0.1))
 
-    ModelGRU.add(GRU(units=100, return_sequences=True, activation='tanh' ))
-    ModelGRU.add(Dropout(0.3))
+    #ModelGRU.add(GRU(units=100, return_sequences=True, activation='tanh' ))
+    #ModelGRU.add(Dropout(0.3))
 
     ModelGRU.add(GRU(units=80, activation='tanh'))
     ModelGRU.add(Dropout(0.1))
