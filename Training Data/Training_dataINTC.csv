@@ -1,0 +1,11 @@
+Ticker,Attributes,DirErr,RMSE,Training_Time
+INTC,"['High', 'Low', 'Open', 'EPS', 'Day', 'Close']",48.47,2.9611696410291013,
+INTC,"['High', 'Low', 'Day', 'Close']",49.34,1.853537826370346,
+INTC,"['High', 'Low', 'Open', 'Close']",48.03,4.141403008470022,
+INTC,"['High', 'Low', 'IR', 'Close']",48.91,2.7116435985760963,
+INTC,"['High', 'Low', 'IR', 'PercentChange', 'Close']",49.34,1.4437040008181155,
+INTC,"['High', 'GT', 'Volume', 'Close']",48.91,1.932458005787468,
+INTC,"['High', 'Low', 'Open', 'Day', 'IR', 'PercentChange', 'Volume', 'Close']",46.72,1.6163223622749716,
+INTC,"['High', 'Volume', 'Close']",48.91,1.5872294741578734,
+,,,,2022-11-30 17:02:30.104234
+,,,,2022-11-30 17:40:52.366779
