@@ -197,7 +197,7 @@ def GRUModelBuild(arrX, arrY, arrDem, daysback):
                                 #A relu activation has been tested here before and proves to give better occasionally better directional
 
     #opt = keras.optimizers.Adam(learning_rate=0.001)
-    ModelGRU.compile(optimizer='adam' , loss='mean_squared_error') #opt
+    ModelGRU.compile(optimizer='RMSprop' , loss='mean_squared_error') #opt
     #Loss of MSE is best in this scenario as it is a measure of how far off the system is from the real value,
         # it acts similar to an averaged standard deviation. Closer to zero is better
     return ModelGRU
